@@ -1,0 +1,12 @@
+{
+	"dependencies": {},
+	"devDependencies": {
+		"esbuild": "0.25.9",
+		"expect": "^29.7.0",
+		"typescript": "^5.9.3"
+	},
+	"scripts": {
+		"test": "node --enable-source-maps --test test.ts"
+	},
+	"type": "module"
+}
