@@ -1,5 +1,5 @@
 import type { PartialMessage, PluginBuild } from "esbuild"
-import type { Checker } from "../Source/pure.ts"
+import type { Checker } from "../Monad/pure.ts"
 
 export const Esbuild = (check: Checker<void>) => ({
 	name: "purity-seal",
@@ -33,18 +33,18 @@ export const Esbuild = (check: Checker<void>) => ({
 
 			for (const dependent in inputs) {
 				for (const { path: dependency } of inputs[dependent]!.imports) {
-					const result = check(dependent, dependency)
+					const result = check([dependent, dependency])
 					switch (result._tag) {
 						case "Pure":
 							warn(dependent, dependency, `unhandled dependency`)
 							break
 						case "Allow":
 							break
-						case "Warning":
+						case "Warn":
 							warn(dependent, dependency, result.Message)
 							break
 						case "Error":
-							error(dependent, dependency, result.Message)
+							error(dependent, dependency, result.Reason)
 							break
 						default: result satisfies never
 					}

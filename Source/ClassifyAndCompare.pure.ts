@@ -1,4 +1,4 @@
-import { type Checker, Error, resultAllow, resultError, resultPure } from "./Checker.pure.ts"
+import { Checker, Opinion } from "../Monad/pure.ts"
 import { MakePartialOrder, type PartialOrder, type PartialOrderKey, QueryPartialOrder } from "./PartialOrder.pure.ts"
 
 const makeClassifier =
@@ -9,21 +9,21 @@ const makeClassifier =
 const classifyAndCompare = <T extends PartialOrderKey>(
 	classify: (path: string) => T | null,
 	po: PartialOrder<T>,
-): Checker<void> => (xPath: string, yPath: string) => {
+): Checker<void> => ([xPath, yPath]: Checker.Deps) => {
 		const xClass = classify(xPath)
 		const yClass = classify(yPath)
 
 		if (xClass === null || yClass === null)
-			return resultPure<void>(undefined)
+			return Opinion.Pure<void>(undefined)
 
 		switch (QueryPartialOrder(po, xClass, yClass)) {
 			case "<":
 			case "=":
-				return resultAllow<void>()
+				return Opinion.Allow()
 			case ">":
 			case "?":
 				// The error message from esbuild already includes xPath.
-				return resultError<void>(`ClassifyAndCompare: can not depend on ${yPath}`)
+				return Opinion.Error(`ClassifyAndCompare: can not depend on ${yPath}`)
 		}
 	}
 
@@ -44,6 +44,6 @@ export const ClassifyAndCompare = <T extends PartialOrderKey>(
 ): Checker<void> => {
 	const po = MakePartialOrder(orderRules)
 	return po === null
-		? Error("ClassifyAndCompare: orderRules induce a cycle")
+		? Checker.Error("ClassifyAndCompare: orderRules induce a cycle")
 		: classifyAndCompare(makeClassifier(classRules), po)
 }

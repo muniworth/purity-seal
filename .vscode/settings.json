@@ -58,6 +58,7 @@
 		{ "format": "svg", "extensions": [".test.ts"], "icon": "test", "overrides": "testts" },
 		{ "format": "svg", "extensions": ["test.ts"], "icon": "test", "filename": true },
 		// Barrels
+		{ "format": "svg", "extensions": ["barrel.ts"], "icon": "affinitydesigner", "filename": true },
 		{ "format": "svg", "extensions": ["index.ts"], "icon": "affinitydesigner", "filename": true },
 	]
 }

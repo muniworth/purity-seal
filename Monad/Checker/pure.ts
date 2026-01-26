@@ -1,0 +1,59 @@
+import { CurryRev, Flow } from "../../Lib/pure.ts"
+import { Opinion } from "../Opinion/barrel.ts"
+import { Reader } from "../Reader/barrel.ts"
+
+/** Reader environment: Dependent, Dependency */
+export type Deps =[string, string]
+export type Checker<A> = Reader<Deps, Opinion<A>>
+
+export const Pure = <A>(val: A): Checker<A> => Reader.Pure(Opinion.Pure(val))
+export const Allow = <A=never>(): Checker<A> => Reader.Pure(Opinion.Allow())
+export const Error = <A=never>(x: string): Checker<A> => Reader.Pure(Opinion.Error(x))
+export const Warn = <A=never>(x: string): Checker<A> => Reader.Pure(Opinion.Warn(x))
+
+export const Bind_ = <A, B>(m: Checker<A>, f: (t: A) => Checker<B>) =>
+	(d: Deps) => Opinion.Bind(m(d), t => f(t)(d))
+export const Bind: {
+	<A, B>(m: Checker<A>, f: (t: A) => Checker<B>): Checker<B>
+	<A, B>(f: (t: A) => Checker<B>): (m: Checker<A>) => Checker<B>
+} = CurryRev(Bind_)
+
+export const Map_ = <A, B>(m: Checker<A>, f: (t: A) => B) =>
+	Bind_(m, Flow(f, Pure))
+export const Map: {
+	<A, B>(m: Checker<A>, f: (t: A) => B): Checker<B>
+	<A, B>(f: (t: A) => B): (m: Checker<A>) => Checker<B>
+} = CurryRev(Map_)
+
+export const Asks = <A>(f: (d: Deps) => A): Checker<A> =>
+	Reader.Asks(Flow(f, Opinion.Pure))
+export const Ask: Checker<Deps> =
+	Asks(d => d)
+
+export const Then_ = <A, B>(m1: Checker<A>, m2: Checker<B>): Checker<B> =>
+	Bind_(m1, _ => m2)
+export const Then: {
+	<A, B>(m1: Checker<A>, m2: Checker<B>): Checker<B>
+	<A, B>(m2: Checker<B>): (m1: Checker<A>) => Checker<B>
+} = CurryRev(Then_)
+
+export const When_ = (b: boolean, m: Checker<void>) =>
+	b ? m : Pure(undefined)
+export const When: {
+	(b: boolean, m: Checker<void>): Checker<void>
+	(m: Checker<void>): (b: boolean) => Checker<void>
+} = CurryRev(When_)
+
+export const AsksWhen_ = (p: (d: Deps) => boolean, m: Checker<void>): Checker<void> =>
+	Bind_(Asks(p), When(m))
+export const AsksWhen: {
+	(p: (d: Deps) => boolean, m: Checker<void>): Checker<void>
+	(m: Checker<void>): (p: (d: Deps) => boolean) => Checker<void>
+} = CurryRev(AsksWhen_)
+
+export const IfM_ = <A>(mp: Checker<boolean>, m1: Checker<A>, m2: Checker<A>): Checker<A> =>
+	Bind_(mp, b => b ? m1 : m2)
+export const IfM: {
+	<A>(mp: Checker<boolean>, m1: Checker<A>, m2: Checker<A>): Checker<A>
+	<A>(m1: Checker<A>, m2: Checker<A>): (mp: Checker<boolean>) => Checker<A>
+} = CurryRev(IfM_)
