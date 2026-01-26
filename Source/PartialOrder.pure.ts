@@ -8,9 +8,13 @@ export type Relation =
 
 export type PartialOrder<T extends PartialOrderKey> = Map<T, Map<T, strictRelation>>
 
+// type twoOrMore<T> = [T, T, ...T[]]
+export type Level<T> = T | T[]
+export type Chain<T> = Level<T>[]
+
 const invert = (rel: strictRelation) => (rel === "<" ? ">" : "<")
 
-export const MakePartialOrder = <T extends PartialOrderKey>(ls: [T, T][]): PartialOrder<T> | null => {
+export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]): PartialOrder<T> | null => {
 	const po = new Map<T, Map<T, strictRelation>>()
 	let cyclic = false
 
@@ -32,20 +36,33 @@ export const MakePartialOrder = <T extends PartialOrderKey>(ls: [T, T][]): Parti
 		addRel(x, "<", y)
 		addRel(y, ">", x)
 	}
+	
+	for (const chain of chains) {
+		if (chain.length === 0) continue
+		// Iterate over adjacent pairs of levels.
+		const head = chain[0]!
+		const tail = chain.slice(1)
+		let xs = Array.isArray(head) ? head : [head]
+		for (const l of tail) {
+			const ys = Array.isArray(l) ? l : [l]
+			for (const x of xs) {
+				for (const y of ys) {
+					addRelSym(x, "<", y)
 
-	ls.forEach(([x, y]) => {
-		addRelSym(x, "<", y)
+					// Transitively-close y: for each w < x, symmetrically set w < y.
+					getRels(x).forEach((rel, w) => {
+						if (rel === ">") addRelSym(w, "<", y)
+					})
 
-		// Transitively-close y: for each w < x, symmetrically set w < y.
-		getRels(x).forEach((rel, w) => {
-			if (rel === ">") addRelSym(w, "<", y)
-		})
-
-		// Transitively-close x: for each z > y, symmetrically set x < z.
-		getRels(y).forEach((rel, z) => {
-			if (rel === "<") addRelSym(x, "<", z)
-		})
-	})
+					// Transitively-close x: for each z > y, symmetrically set x < z.
+					getRels(y).forEach((rel, z) => {
+						if (rel === "<") addRelSym(x, "<", z)
+					})
+				}
+			}
+			xs = ys
+		}
+	}
 
 	return cyclic ? null : po
 }
