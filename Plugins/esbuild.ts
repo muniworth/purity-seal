@@ -8,7 +8,7 @@ export const Esbuild = (check: Checker<void>) => ({
 		build.initialOptions.metafile = true
 
 		build.onEnd(buildResult => {
-			if (buildResult.metafile === void 0) return {}
+			if (buildResult.metafile === undefined) return {}
 			const inputs = buildResult.metafile.inputs
 
 			const warnings: PartialMessage[] = []
@@ -34,7 +34,7 @@ export const Esbuild = (check: Checker<void>) => ({
 			for (const dependent in inputs) {
 				for (const { path: dependency } of inputs[dependent]!.imports) {
 					const result = check(dependent, dependency)
-					switch (result.Case) {
+					switch (result._tag) {
 						case "Pure":
 							warn(dependent, dependency, `unhandled dependency`)
 							break

@@ -1,12 +1,15 @@
 {
-	"dependencies": {},
 	"devDependencies": {
+		"@types/express": "^5.0.6",
+		"@types/node": "^25.0.10",
 		"esbuild": "0.25.9",
-		"expect": "^29.7.0",
+		"expect": "^30.1.2",
 		"typescript": "^5.9.3"
 	},
 	"scripts": {
-		"test": "node --enable-source-maps --test test.ts"
+		"test": "node --enable-source-maps --test test.ts",
+		"typecheck": "tsc --watch --project tsconfig.json --preserveWatchOutput",
+		"typecheck-once": "tsc --project tsconfig.json"
 	},
 	"type": "module"
 }
