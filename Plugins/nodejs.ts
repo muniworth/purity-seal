@@ -1,1 +1,1 @@
-export * as Plugin from "./barrel.nodejs.ts"
+export * as Plugin from "./esbuild.ts"

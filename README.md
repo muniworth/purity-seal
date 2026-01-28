@@ -63,12 +63,14 @@ graph BT;
 
 ```
 ```ts
-const checker = Result.GetOrThrow(PS.Compare.ClassifyAndCompare(
-	PS.Classify.File.FromExtensions(["http.state", "pure", "state", "http"]),
-	PS.Compare.PartialOrder.Make([
-		["http.state", ["state", "http"], "pure"],
-	]),
-))
+const classify = PS.Classify.File.FromExtensions(["http.state", "pure", "state", "http"])
+const po = PS.Compare.PartialOrder.Make([
+	["http.state", ["state", "http"], "pure"],
+])
+const plugin = PS.Pipe(
+	PS.Compare.ClassifyAndCompare(classify, po),
+	PS.Plugin.Esbuild,
+)
 ```
 
 ### Separate Business Logic from Library
@@ -76,17 +78,16 @@ const checker = Result.GetOrThrow(PS.Compare.ClassifyAndCompare(
 graph LR;
 	domain.ts --> pure.ts
 	math.ts --> domain.ts
-	Main.ts --> math.ts
 ```
 ```ts
-const graph = PuritySeal.Classify({
-	Unit: ["pure"],
-	Directional: [
-		{ Dependent: "domain", Dependency: "pure" },
-		{ Dependent: "math", Dependency: "pure" },
-		{ Dependent: "math", Dependency: "domain" },
-	],
-})
+const classify = PS.Classify.File.FromExtensions(["pure", "domain", "math"])
+const po = PS.Compare.PartialOrder.Make([
+	["math", "domain", "pure"],
+])
+const plugin = PS.Pipe(
+	PS.Compare.ClassifyAndCompare(classify, po),
+	PS.Plugin.Esbuild,
+)
 ```
 
 ### The Kitchen Sink
