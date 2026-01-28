@@ -1,5 +1,5 @@
 import path from "node:path"
-import { Array, Pipe } from "../Lib/pure.ts"
+import { Array, Option, Pipe } from "../Lib/pure.ts"
 import type { Classifier } from "./ClassifyAndCompare.pure.ts"
 
 const matchExtension = (ext: string, filename: string): boolean =>
@@ -18,22 +18,11 @@ export const MatchExtension =
 		}
 	}
 
-type rule<T> = {
-	Class: T
-	Matcher: (path: string) => boolean
+/** Create list of filename -> extension matchers. Order matters, so put globs first. */
+export const FromExtensions = <A extends string>(exts: readonly A[]): Classifier<A> => {
+	const rules = Array.Map(exts, a => ({ Class: a, Matcher: MatchExtension(a) }))
+	return filepath => Pipe(
+		Array.Find_(rules, r => r.Matcher(filepath)),
+		Option.Map(x => x.Class),
+	)
 }
-const makeClassifier =
-	<T>(rules: rule<T>[]): Classifier<T> =>
-	s => rules.find(r => r.Matcher(s))?.Class ?? null
-
-const classifyExtension = <T extends string>(ext: T): rule<T> => ({
-	Class: ext,
-	Matcher: MatchExtension(ext),
-})
-
-// TODO finish this and shift unit tests over to it.
-const foo = Pipe(
-	["pure", "dom", "dom.http", "http"] as const,
-	Array.Map(classifyExtension),
-	makeClassifier,
-)

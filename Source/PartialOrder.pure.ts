@@ -1,3 +1,5 @@
+import { Option } from "../Lib/pure.ts"
+
 export type PartialOrderKey = boolean | number | bigint | string | symbol
 
 type strictRelation = "<" | ">"
@@ -14,7 +16,7 @@ export type Chain<T> = Level<T>[]
 
 const invert = (rel: strictRelation) => (rel === "<" ? ">" : "<")
 
-export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]): PartialOrder<T> | null => {
+export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]): Option<PartialOrder<T>> => {
 	const po = new Map<T, Map<T, strictRelation>>()
 	let cyclic = false
 
@@ -36,7 +38,7 @@ export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]):
 		addRel(x, "<", y)
 		addRel(y, ">", x)
 	}
-	
+
 	for (const chain of chains) {
 		if (chain.length === 0) continue
 		// Iterate over adjacent pairs of levels.
@@ -64,7 +66,7 @@ export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]):
 		}
 	}
 
-	return cyclic ? null : po
+	return cyclic ? Option.None() : Option.Some(po)
 }
 
 export const QueryPartialOrder = <T extends PartialOrderKey>(po: PartialOrder<T>, x: T, y: T): Relation =>

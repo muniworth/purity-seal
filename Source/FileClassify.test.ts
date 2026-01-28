@@ -1,5 +1,8 @@
 import { describe, it } from "node:test"
 import { expect } from "expect"
+
+import { Option } from "../Lib/pure.ts"
+import type { Classifier } from "./ClassifyAndCompare.pure.ts"
 import * as FileClassify from "./FileClassify.nodejs.ts"
 
 await describe("Classify file by one extension", async () => {
@@ -82,5 +85,42 @@ await describe("Classify file by multiple extensions", async () => {
 		expect(hasExtension("foo.aa.bb/foo.aa.bb.lua")).toEqual(true)
 		expect(hasExtension("aa.bb/foo.lua")).toEqual(false)
 		expect(hasExtension("foo.aa.bb/foo.lua")).toEqual(false)
+	})
+})
+
+await describe("Classifier works for a few extensions", async () => {
+	const classify: Classifier<"pure" | "dom" | "dom.http" | "http"> = FileClassify
+		.FromExtensions(["dom.http", "pure", "dom", "http"])
+
+	await it("Fails with wrong extensions", () => {
+		expect(classify("foo")).toEqual(Option.None())
+		expect(classify("foo/bar")).toEqual(Option.None())
+
+		expect(classify("foo.moo")).toEqual(Option.None())
+		expect(classify("foo/bar.moo")).toEqual(Option.None())
+	})
+
+	await it("Matches extensions without path", () => {
+		expect(classify("pure")).toEqual(Option.Some("pure"))
+		expect(classify("dom")).toEqual(Option.Some("dom"))
+		expect(classify("dom.http")).toEqual(Option.Some("dom.http"))
+		expect(classify("http")).toEqual(Option.Some("http"))
+
+		expect(classify("foo.pure")).toEqual(Option.Some("pure"))
+		expect(classify("foo.dom")).toEqual(Option.Some("dom"))
+		expect(classify("foo.dom.http")).toEqual(Option.Some("dom.http"))
+		expect(classify("foo.http")).toEqual(Option.Some("http"))
+	})
+
+	await it("Matches extensions with path", () => {
+		expect(classify("bar/foo.pure")).toEqual(Option.Some("pure"))
+		expect(classify("bar/foo.dom")).toEqual(Option.Some("dom"))
+		expect(classify("bar/foo.dom.http")).toEqual(Option.Some("dom.http"))
+		expect(classify("bar/foo.http")).toEqual(Option.Some("http"))
+
+		expect(classify("bar/foo.pure")).toEqual(Option.Some("pure"))
+		expect(classify("bar/foo.dom")).toEqual(Option.Some("dom"))
+		expect(classify("bar/foo.dom.http")).toEqual(Option.Some("dom.http"))
+		expect(classify("bar/foo.http")).toEqual(Option.Some("http"))
 	})
 })
