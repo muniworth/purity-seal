@@ -2,7 +2,7 @@ import { describe, it } from "node:test"
 import { expect } from "expect"
 
 import { Option } from "../Lib/pure.ts"
-import type { Classifier } from "./ClassifyAndCompare.pure.ts"
+import type { Classifier } from "../Monad/pure.ts"
 import * as FileClassify from "./FileClassify.nodejs.ts"
 
 await describe("Classify file by one extension", async () => {

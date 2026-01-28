@@ -1,9 +1,6 @@
 import { Option, Pipe } from "../Lib/pure.ts"
-import { Checker, Opinion } from "../Monad/pure.ts"
+import { Checker, Classifier, Opinion } from "../Monad/pure.ts"
 import { type Chain, MakePartialOrder, type PartialOrder, type PartialOrderKey, QueryPartialOrder } from "./PartialOrder.pure.ts"
-
-// TODO implement Classifier with Reader<filepath, option<T>>
-export type Classifier<T> = (filepath: string) => Option<T>
 
 const classifyAndCompare = <T extends PartialOrderKey>(
 	classify: Classifier<T>,
