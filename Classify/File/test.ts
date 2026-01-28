@@ -1,11 +1,11 @@
 import { describe, it } from "node:test"
 import { expect } from "expect"
 
-import { Option } from "../Lib/pure.ts"
-import * as FileClassify from "./FileClassify.nodejs.ts"
+import { Option } from "../../Lib/pure.ts"
+import { Classify } from "../nodejs.ts"
 
 await describe("Classify file by one extension", async () => {
-	const classify = FileClassify.FromExtensions(["dom.http", "pure", "dom", "http"])
+	const classify = Classify.File.FromExtensions(["dom.http", "pure", "dom", "http"])
 
 	await it("Fails if missing", () => {
 		expect(classify("")).toEqual(Option.None())
@@ -53,7 +53,7 @@ await describe("Classify file by one extension", async () => {
 })
 
 await describe("Classify file by glob extension", async () => {
-	const classify = FileClassify.FromExtensions(["worker.nodejs", "api.state", "state", "api", "pure"])
+	const classify = Classify.File.FromExtensions(["worker.nodejs", "api.state", "state", "api", "pure"])
 
 	await it("Matches simple", () => {
 		expect(classify("api.state.lua")).toEqual(Option.Some("api.state"))

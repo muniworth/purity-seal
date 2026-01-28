@@ -1,2 +1,2 @@
-import "./Monad/test.ts"
-import "./Source/test.ts"
+import "./Classify/test.ts"
+import "./Compare/test.ts"

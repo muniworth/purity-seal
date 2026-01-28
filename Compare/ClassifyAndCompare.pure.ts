@@ -1,9 +1,12 @@
+import { Classify } from "../Classify/pure.ts"
+import { Checker } from "../Compare/Checker/pure.ts"
+import { Opinion } from "../Compare/Opinion/pure.ts"
 import { Option, Pipe } from "../Lib/pure.ts"
-import { Checker, Classifier, Opinion } from "../Monad/pure.ts"
+
 import { type Chain, MakePartialOrder, type PartialOrder, type PartialOrderKey, QueryPartialOrder } from "./PartialOrder.pure.ts"
 
 const classifyAndCompare = <T extends PartialOrderKey>(
-	classify: Classifier<T>,
+	classify: Classify.Classifier<T>,
 	po: PartialOrder<T>,
 ): Checker<void> =>
 	([xPath, yPath]: Checker.Deps) => Pipe(
@@ -38,7 +41,7 @@ const classifyAndCompare = <T extends PartialOrderKey>(
  * This function returns a Checker that always errors if `orderRules` induce a
  * cycle. */
 export const ClassifyAndCompare = <T extends PartialOrderKey>(
-	classify: Classifier<T>,
+	classify: Classify.Classifier<T>,
 	chains: Chain<T>[],
 ): Checker<void> => Pipe(
 	MakePartialOrder(chains),

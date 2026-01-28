@@ -1,6 +1,6 @@
 import { describe, it } from "node:test"
 import { expect } from "expect"
-import { Checker, Opinion } from "../Monad/pure.ts"
+import { Checker, Opinion } from "../Compare/pure.ts"
 import { ClassifyAndCompare } from "./pure.ts"
 
 await describe("Checker", async () => {

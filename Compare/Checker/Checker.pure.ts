@@ -1,5 +1,5 @@
 import { CurryRev, Flow, Reader } from "../../Lib/pure.ts"
-import { Opinion } from "../Opinion/barrel.ts"
+import { Opinion } from "../Opinion/pure.ts"
 
 /** Reader environment: Dependent, Dependency */
 export type Deps =[string, string]

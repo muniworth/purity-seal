@@ -1,6 +1,6 @@
 import path from "node:path"
-import { Array, Option, Pipe } from "../Lib/pure.ts"
-import type { Classifier } from "../Monad/pure.ts"
+import { Array, Option, Pipe } from "../../Lib/pure.ts"
+import type { Classifier } from "../Classifier/pure.ts"
 
 const matchExtension =
 	<T extends string>(glob: T) => {

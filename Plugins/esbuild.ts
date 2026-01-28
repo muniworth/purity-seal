@@ -1,5 +1,5 @@
 import type { PartialMessage, PluginBuild } from "esbuild"
-import type { Checker } from "../Monad/pure.ts"
+import type { Checker } from "../Compare/pure.ts"
 
 export const Esbuild = (check: Checker<void>) => ({
 	name: "purity-seal",

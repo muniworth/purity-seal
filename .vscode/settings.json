@@ -54,11 +54,14 @@
 		// Pure (no effects)
 		{ "format": "svg", "extensions": [".pure.ts"], "icon": "haskell" },
 		{ "format": "svg", "extensions": ["pure.ts"], "icon": "haskell", "filename": true },
+		// NodeJS
+		{ "format": "svg", "extensions": [".nodejs.ts"], "icon": "node", "filename": true, "overrides": "typescript" },
+		{ "format": "svg", "extensions": ["nodejs.ts"], "icon": "node", "filename": true, "overrides": "typescript" },
 		// Tests
 		{ "format": "svg", "extensions": [".test.ts"], "icon": "test", "overrides": "testts" },
 		{ "format": "svg", "extensions": ["test.ts"], "icon": "test", "filename": true },
 		// Barrels
-		{ "format": "svg", "extensions": ["barrel.ts"], "icon": "affinitydesigner", "filename": true },
-		{ "format": "svg", "extensions": ["index.ts"], "icon": "affinitydesigner", "filename": true },
+		{ "format": "svg", "extensions": ["barrel.pure.ts"], "icon": "affinitydesigner", "filename": true },
+		{ "format": "svg", "extensions": ["barrel.nodejs.ts"], "icon": "affinitydesigner", "filename": true },
 	]
 }
