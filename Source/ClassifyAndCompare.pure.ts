@@ -1,13 +1,11 @@
 import { Checker, Opinion } from "../Monad/pure.ts"
 import { type Chain, MakePartialOrder, type PartialOrder, type PartialOrderKey, QueryPartialOrder } from "./PartialOrder.pure.ts"
 
-const makeClassifier =
-	<T>(rules: [RegExp, T][]) =>
-	(s: string): T | null =>
-		rules.find(([re, _class]) => re.exec(s) !== null)?.[1] ?? null
+// TODO implement Classifier with Reader<filepath, option<T>>
+export type Classifier<T> = (filepath: string) => T | null
 
 const classifyAndCompare = <T extends PartialOrderKey>(
-	classify: (path: string) => T | null,
+	classify: Classifier<T>,
 	po: PartialOrder<T>,
 ): Checker<void> => ([xPath, yPath]: Checker.Deps) => {
 		const xClass = classify(xPath)
@@ -39,11 +37,11 @@ const classifyAndCompare = <T extends PartialOrderKey>(
  * This function returns a Checker that always errors if `orderRules` induce a
  * cycle. */
 export const ClassifyAndCompare = <T extends PartialOrderKey>(
-	classRules: [RegExp, T][],
+	classify: Classifier<T>,
 	chains: Chain<T>[],
 ): Checker<void> => {
 	const po = MakePartialOrder(chains)
 	return po === null
 		? Checker.Error("ClassifyAndCompare: orderRules induce a cycle")
-		: classifyAndCompare(makeClassifier(classRules), po)
+		: classifyAndCompare(classify, po)
 }
