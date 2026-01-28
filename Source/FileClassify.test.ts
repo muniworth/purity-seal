@@ -60,21 +60,19 @@ await describe("Classify file by glob extension", async () => {
 		expect(classify("Foo.api.state.lua")).toEqual(Option.Some("api.state"))
 	})
 
-	await it("Matches around other extensions", () => {
-		expect(classify("api.state.aa.bb.lua")).toEqual(Option.Some("api.state"))
-		expect(classify("aa.api.state.bb.lua")).toEqual(Option.Some("api.state"))
-		expect(classify("aa.bb.api.state.lua")).toEqual(Option.Some("api.state"))
-	})
-
 	await it("Ignores filepath", () => {
 		expect(classify("Foo.pure/Foo.lua")).toEqual(Option.None())
 		expect(classify("Foo.pure/Bar.api.state.lua")).toEqual(Option.Some("api.state"))
 		expect(classify("api.state/pure.lua")).toEqual(Option.Some("pure"))
 	})
 
-	await it("Fails if out of order", () => {
+	await it("Respects classification order", () => {
 		expect(classify("Bar.worker.nodejs.aa.bb.lua")).toEqual(Option.Some("worker.nodejs"))
 		expect(classify("Bar.worker.aa.nodejs.bb.lua")).toEqual(Option.None())
+
+		expect(classify("api.state.aa.bb.lua")).toEqual(Option.Some("api.state"))
+		expect(classify("aa.api.state.bb.lua")).toEqual(Option.Some("api.state"))
+		expect(classify("aa.bb.api.state.lua")).toEqual(Option.Some("api.state"))
 
 		expect(classify("Bar.state.api.lua")).toEqual(Option.Some("state"))
 		expect(classify("Bar.api.aa.state.bb.lua")).toEqual(Option.Some("state"))
