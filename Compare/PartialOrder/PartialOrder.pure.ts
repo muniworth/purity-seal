@@ -1,6 +1,6 @@
-import { Result } from "../Lib/pure.ts"
+import { Result } from "../../Lib/pure.ts"
 
-export type PartialOrderKey = boolean | number | bigint | string | symbol
+export type Key = boolean | number | bigint | string | symbol
 
 type strictRelation = "<" | ">"
 export type Relation =
@@ -8,7 +8,7 @@ export type Relation =
 	| "=" // Derived from equality on T
 	| "?" // Encoded as absence of a map entry
 
-export type PartialOrder<T extends PartialOrderKey> = Map<T, Map<T, strictRelation>>
+export type PartialOrder<T extends Key> = Map<T, Map<T, strictRelation>>
 
 // type twoOrMore<T> = [T, T, ...T[]]
 export type Level<T> = T | T[]
@@ -16,7 +16,7 @@ export type Chain<T> = Level<T>[]
 
 const invert = (rel: strictRelation) => (rel === "<" ? ">" : "<")
 
-export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]): Result<PartialOrder<T>, string> => {
+export const Make = <T extends Key>(chains: Chain<T>[]): Result<PartialOrder<T>, string> => {
 	const po = new Map<T, Map<T, strictRelation>>()
 	let cyclic = false
 
@@ -71,5 +71,5 @@ export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]):
 		: Result.Ok(po)
 }
 
-export const QueryPartialOrder = <T extends PartialOrderKey>(po: PartialOrder<T>, x: T, y: T): Relation =>
+export const Query = <T extends Key>(po: PartialOrder<T>, x: T, y: T): Relation =>
 	x === y ? "=" : (po.get(x)?.get(y) ?? "?")

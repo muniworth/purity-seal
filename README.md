@@ -63,13 +63,13 @@ graph BT;
 
 ```
 ```ts
-const checker = Compare.ClassifyAndCompare(
-	Classify.File.FromExtensions(["http.state", "pure", "state", "http"]),
-	[
+const checker = Result.GetOrThrow(PS.Compare.ClassifyAndCompare(
+	PS.Classify.File.FromExtensions(["http.state", "pure", "state", "http"]),
+	PS.Compare.PartialOrder.Make([
 		["http.state", "state", "pure"],
 		["http.state", "http", "pure"],
-	],
-)
+	]),
+))
 ```
 
 ### Separate Business Logic from Library

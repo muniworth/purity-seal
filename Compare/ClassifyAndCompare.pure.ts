@@ -3,9 +3,9 @@ import { Checker } from "../Compare/Checker/pure.ts"
 import { Opinion } from "../Compare/Opinion/pure.ts"
 import { Option, Pipe, Result } from "../Lib/pure.ts"
 
-import { type Chain, MakePartialOrder, type PartialOrder, type PartialOrderKey, QueryPartialOrder } from "./PartialOrder.pure.ts"
+import { PartialOrder } from "./PartialOrder/pure.ts"
 
-const classifyAndCompare = <T extends PartialOrderKey>(
+const classifyAndCompare = <T extends PartialOrder.Key>(
 	classify: Classify.Classifier<T>,
 	po: PartialOrder<T>,
 ): Checker<void> =>
@@ -14,7 +14,7 @@ const classifyAndCompare = <T extends PartialOrderKey>(
 		Option.Elim(
 			Opinion.Pure<void>(undefined),
 			([xClass, yClass]): Opinion<never> => {
-				switch (QueryPartialOrder(po, xClass, yClass)) {
+				switch (PartialOrder.Query(po, xClass, yClass)) {
 				case "<":
 				case "=":
 					return Opinion.Allow()
@@ -34,13 +34,11 @@ const classifyAndCompare = <T extends PartialOrderKey>(
  * If either the dependent or dependency file don't match any rule in
  * `classRules`, then the returned checker behaves as `Pure(undefined)` (i.e.,
  * it has "no opinion" on whether the file should be allowed or rejected).
- *
- * This function returns a Checker that always errors if `orderRules` induce a
- * cycle. */
-export const ClassifyAndCompare = <T extends PartialOrderKey>(
+ */
+export const ClassifyAndCompare = <T extends PartialOrder.Key>(
 	classify: Classify.Classifier<T>,
-	chains: Chain<T>[],
+	partialOrder: Result<PartialOrder<T>, string>,
 ): Result<Checker<void>, string> => Pipe(
-	MakePartialOrder(chains),
+	partialOrder,
 	Result.Map(po => classifyAndCompare(classify, po))
 )
