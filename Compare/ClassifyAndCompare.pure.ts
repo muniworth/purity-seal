@@ -1,7 +1,7 @@
 import { Classify } from "../Classify/pure.ts"
 import { Checker } from "../Compare/Checker/pure.ts"
 import { Opinion } from "../Compare/Opinion/pure.ts"
-import { Option, Pipe } from "../Lib/pure.ts"
+import { Option, Pipe, Result } from "../Lib/pure.ts"
 
 import { type Chain, MakePartialOrder, type PartialOrder, type PartialOrderKey, QueryPartialOrder } from "./PartialOrder.pure.ts"
 
@@ -20,10 +20,7 @@ const classifyAndCompare = <T extends PartialOrderKey>(
 					return Opinion.Allow()
 				case ">":
 				case "?":
-					// The error message from esbuild already includes xPath.
-					// TODO - we could pass a structured error message and
-					//        let the plugin convert to string.
-					return Opinion.Error(`ClassifyAndCompare: can not depend on ${yPath}`)
+					return Opinion.Deny([xPath, yPath])
 				}
 			},
 		),
@@ -43,10 +40,7 @@ const classifyAndCompare = <T extends PartialOrderKey>(
 export const ClassifyAndCompare = <T extends PartialOrderKey>(
 	classify: Classify.Classifier<T>,
 	chains: Chain<T>[],
-): Checker<void> => Pipe(
+): Result<Checker<void>, string> => Pipe(
 	MakePartialOrder(chains),
-	Option.ElimLazy(
-		() => Checker.Error("ClassifyAndCompare: orderRules induce a cycle"),
-		po => classifyAndCompare(classify, po),
-	)
+	Result.Map(po => classifyAndCompare(classify, po))
 )

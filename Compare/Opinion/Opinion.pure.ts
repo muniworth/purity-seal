@@ -1,3 +1,6 @@
+// Circular, but it's type-only so it's fine.
+import type { Deps } from "../Checker/Checker.pure.ts"
+
 /** Pure is the monad success case for checker pipelines
   * to continue running, i.e. Pure = Undecided.
   *
@@ -7,12 +10,12 @@
 export type Opinion<A> =
 	| { _tag: "Pure", Value: A }
 	| { _tag: "Allow" }
-	| { _tag: "Error", Reason: string }
+	| { _tag: "Deny", Deps: Deps}
 	| { _tag: "Warn", Message: string }
 
 export const Pure = <A>(a: A): Opinion<A> => ({ _tag: "Pure", Value: a })
 export const Allow = (): Opinion<never> => ({ _tag: "Allow" })
-export const Error = (x: string): Opinion<never> => ({ _tag: "Error", Reason: x })
+export const Deny = (d: Deps): Opinion<never> => ({ _tag: "Deny", Deps: d })
 export const Warn = (x: string): Opinion<never> => ({ _tag: "Warn", Message: x })
 
 export const Map = <A, B>(m: Opinion<A>, f: (a: A) => B): Opinion<B> =>

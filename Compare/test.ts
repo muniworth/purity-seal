@@ -1,2 +1,2 @@
 import "./Checker/test.ts"
-import "./ClassifyAndCompare.test.ts"
+import "./PartialOrder.test.ts"

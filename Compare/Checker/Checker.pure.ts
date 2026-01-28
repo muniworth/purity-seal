@@ -2,12 +2,12 @@ import { CurryRev, Flow, Reader } from "../../Lib/pure.ts"
 import { Opinion } from "../Opinion/pure.ts"
 
 /** Reader environment: Dependent, Dependency */
-export type Deps =[string, string]
+export type Deps = readonly [string, string]
 export type Checker<A> = Reader<Deps, Opinion<A>>
 
 export const Pure = <A>(val: A): Checker<A> => Reader.Pure(Opinion.Pure(val))
 export const Allow = <A=never>(): Checker<A> => Reader.Pure(Opinion.Allow())
-export const Error = <A=never>(x: string): Checker<A> => Reader.Pure(Opinion.Error(x))
+export const Deny = <A=never>(): Checker<A> => Reader.Asks(Opinion.Deny)
 export const Warn = <A=never>(x: string): Checker<A> => Reader.Pure(Opinion.Warn(x))
 
 export const Bind_ = <A, B>(m: Checker<A>, f: (t: A) => Checker<B>) =>

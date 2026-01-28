@@ -1,4 +1,4 @@
-import { Option } from "../Lib/pure.ts"
+import { Result } from "../Lib/pure.ts"
 
 export type PartialOrderKey = boolean | number | bigint | string | symbol
 
@@ -16,7 +16,7 @@ export type Chain<T> = Level<T>[]
 
 const invert = (rel: strictRelation) => (rel === "<" ? ">" : "<")
 
-export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]): Option<PartialOrder<T>> => {
+export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]): Result<PartialOrder<T>, string> => {
 	const po = new Map<T, Map<T, strictRelation>>()
 	let cyclic = false
 
@@ -66,7 +66,9 @@ export const MakePartialOrder = <T extends PartialOrderKey>(chains: Chain<T>[]):
 		}
 	}
 
-	return cyclic ? Option.None() : Option.Some(po)
+	return cyclic
+		? Result.Error("ClassifyAndCompare: orderRules induce a cycle")
+		: Result.Ok(po)
 }
 
 export const QueryPartialOrder = <T extends PartialOrderKey>(po: PartialOrder<T>, x: T, y: T): Relation =>

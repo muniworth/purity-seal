@@ -57,29 +57,19 @@ const graph = PuritySeal.Classify({
 ```mermaid
 graph BT;
 	http.ts --> pure.ts
+	state.ts --> pure.ts
+	http.state.ts --> state.ts
+	http.state.ts --> http.ts
 
-	Cache.state.ts --> pure.ts
-
-	subgraph HTTP Cache
-		provider.ts
-	end
-	provider.ts --> Cache.state.ts
-	provider.ts --> http.ts
-
-	subgraph Build Entries
-		Main.ts
-	end
-
-	Main.ts --> provider.ts
 ```
 ```ts
-const graph = PuritySeal.Classify({
-	Unit: ["pure"],
-	Commutative: ["http", "state"],
-	Composite: [
-		["provider", ["http", "state"]],
+const checker = Compare.ClassifyAndCompare(
+	Classify.File.FromExtensions(["http.state", "pure", "state", "http"]),
+	[
+		["http.state", "state", "pure"],
+		["http.state", "http", "pure"],
 	],
-})
+)
 ```
 
 ### Separate Business Logic from Library

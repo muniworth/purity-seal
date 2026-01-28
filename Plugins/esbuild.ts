@@ -1,7 +1,7 @@
 import type { PartialMessage, PluginBuild } from "esbuild"
-import type { Checker } from "../Compare/pure.ts"
+import type { Compare } from "../nodejs.ts"
 
-export const Esbuild = (check: Checker<void>) => ({
+export const Esbuild = (check: Compare.Checker<void>) => ({
 	name: "purity-seal",
 
 	setup: (build: PluginBuild) => {
@@ -43,8 +43,10 @@ export const Esbuild = (check: Checker<void>) => ({
 						case "Warn":
 							warn(dependent, dependency, result.Message)
 							break
-						case "Error":
-							error(dependent, dependency, result.Reason)
+						case "Deny":
+							// esbuild always outputs dependent in error message.
+							const reason = `ClassifyAndCompare: can not depend on ${result.Deps[1]}`
+							error(dependent, dependency, reason)
 							break
 						default: result satisfies never
 					}
