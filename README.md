@@ -66,8 +66,7 @@ graph BT;
 const checker = Result.GetOrThrow(PS.Compare.ClassifyAndCompare(
 	PS.Classify.File.FromExtensions(["http.state", "pure", "state", "http"]),
 	PS.Compare.PartialOrder.Make([
-		["http.state", "state", "pure"],
-		["http.state", "http", "pure"],
+		["http.state", ["state", "http"], "pure"],
 	]),
 ))
 ```
