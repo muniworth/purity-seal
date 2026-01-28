@@ -8,10 +8,11 @@ const matchExtension =
 
 		return (filepath: string): boolean => {
 			const filename = path.basename(filepath)
-			// glob ordering non-symmetric, ex. a.b <> b.a
+			const fileParts = filename.split(".")
+			// glob ordering non-symmetric: a.b <> b.a
 			return filename.includes(glob)
-				// glob parts individually valid, ex. hellofoo.moo <> hello.foo.moo
-				&& exts.every(ext => filename.split(".").includes(ext))
+				// glob parts individually valid: a.bc <> a.b.c
+				&& exts.every(ext => fileParts.includes(ext))
 		}
 	}
 

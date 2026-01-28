@@ -68,6 +68,8 @@ await describe("Classify file by glob extension", async () => {
 
 	await it("Respects classification order", () => {
 		expect(classify("Bar.worker.nodejs.aa.bb.lua")).toEqual(Option.Some("worker.nodejs"))
+		expect(classify("Baarworker.nodejs.aa.bb.lua")).toEqual(Option.None())
+		expect(classify("Barworker.nodejss.aa.bb.lua")).toEqual(Option.None())
 		expect(classify("Bar.worker.aa.nodejs.bb.lua")).toEqual(Option.None())
 
 		expect(classify("api.state.aa.bb.lua")).toEqual(Option.Some("api.state"))
