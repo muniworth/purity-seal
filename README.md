@@ -16,11 +16,11 @@ graph BT;
 ```
 ```ts
 const classify = PS.Classify.File.FromExtensions(["pure", "state", "http"])
-const po = PS.Compare.PartialOrder.Make([
-	["state.http", ["state", "http"], "pure"],
+const po = PS.PartialOrder.Make([
+	[["http.state", "state.http"], ["state", "http"], "pure"],
 ])
-const plugin = PS.Pipe(
-	PS.Compare.ClassifyAndCompare(classify, po),
+const check = PS.Pipe(
+	PS.Compare.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -32,12 +32,12 @@ graph LR;
 	math.ts --> domain.ts
 ```
 ```ts
-const classify = PS.Classify.File.FromExtensions(["pure", "domain", "math"])
-const po = PS.Compare.PartialOrder.Make([
+const classify = PS.Classify.File.FromExtensions(["pure", "math", "domain"])
+const po = PS.PartialOrder.Make([
 	["math", "domain", "pure"],
 ])
-const plugin = PS.Pipe(
-	PS.Compare.ClassifyAndCompare(classify, po),
+const check = PS.Pipe(
+	PS.Compare.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -67,13 +67,13 @@ graph BT;
 const classify = PS.Classify.File.FromExtensions([
 	"pure", "http", "dom", "worker", "test", "browser", "thread",
 ])
-const po = PS.Compare.PartialOrder.Make([
+const po = PS.PartialOrder.Make([
 	["browser", ["http", "dom"], "pure"],
 	["thread", ["http", "worker"], "pure"],
 	["test", "pure"],
 ])
-const plugin = PS.Pipe(
-	PS.Compare.ClassifyAndCompare(classify, po),
+const check = PS.Pipe(
+	PS.Compare.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```

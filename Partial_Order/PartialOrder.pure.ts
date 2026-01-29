@@ -1,4 +1,4 @@
-import { Result } from "../../Lib/pure.ts"
+import { Result } from "../Lib/pure.ts"
 
 export type Key = boolean | number | bigint | string | symbol
 
@@ -67,7 +67,7 @@ export const Make = <T extends Key>(chains: Chain<T>[]): Result<PartialOrder<T>,
 	}
 
 	return cyclic
-		? Result.Error("ClassifyAndCompare: orderRules induce a cycle")
+		? Result.Error("Partial order rules induce a cycle")
 		: Result.Ok(po)
 }
 

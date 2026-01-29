@@ -5,11 +5,11 @@ import * as PS from "../nodejs.ts"
 
 await describe("Diamond: cache, http, state, pure", async () => {
 	const classify = PS.Classify.File.FromExtensions(["pure", "state", "http"])
+	const po = PS.PartialOrder.Make([
+		[["http.state", "state.http"], ["state", "http"], "pure"],
+	])
 	const check = PS.Pipe(
-		PS.Compare.PartialOrder.Make([
-			[["http.state", "state.http"], ["state", "http"], "pure"],
-		]),
-		PS.Compare.BuildChecker(classify),
+		PS.Compare.BuildChecker(classify)(po),
 		PS.Result.GetOrThrow,
 	)
 
