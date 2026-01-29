@@ -1,57 +1,10 @@
 # Purity Seal Examples
-- [Isolate Runtime Platforms](#isolate-runtime-platforms)
 - [Enforce Onion Architecture](#enforce-onion-architecture)
 - [Separate Business Logic from Library](#separate-business-logic-from-library)
+- [Isolate Runtime Platforms](#isolate-runtime-platforms)
 - [The Kitchen Sink](#the-kitchen-sink)
 - [Alternative](#alternative)
 - [Reclassify](#reclassify)
-
-### Isolate Runtime Platforms
-```mermaid
-graph BT;
-	subgraph Fetch API
-		http.ts
-	end
-	http.ts --> pure.ts
-
-	subgraph Browser Main Thread
-		dom.ts
-	end
-	dom.ts --> pure.ts
-
-	subgraph Worker Thread Context
-		worker.ts
-	end
-	worker.ts --> pure.ts
-
-	subgraph NodeJS
-		Assert.test.ts
-	end
-	Assert.test.ts --> pure.ts
-
-	subgraph Build Entries
-		Main.ts
-		Foo.ts
-		Bar.ts
-		test.ts
-	end
-
-	Main.ts --> dom.ts
-	Main.ts --> http.ts
-	Foo.ts --> http.ts
-	Foo.ts --> worker.ts
-	Bar.ts --> worker.ts
-	Bar.ts --> pure.ts
-	test.ts --> pure.ts
-	test.ts --> Assert.test.ts
-```
-```ts
-const graph = PuritySeal.Classify({
-	Unit: ["pure"],
-	Commutative: ["http"],
-	Exclusive: ["dom", "test", "worker"],
-})
-```
 
 ### Enforce Onion Architecture
 ```mermaid
@@ -83,6 +36,42 @@ graph LR;
 const classify = PS.Classify.File.FromExtensions(["pure", "domain", "math"])
 const po = PS.Compare.PartialOrder.Make([
 	["math", "domain", "pure"],
+])
+const plugin = PS.Pipe(
+	PS.Compare.ClassifyAndCompare(classify, po),
+	PS.Plugin.Esbuild,
+)
+```
+
+### Isolate Runtime Platforms
+```mermaid
+graph BT;
+	Fetch.http.ts --> pure.ts
+	dom.ts --> pure.ts
+	worker.ts --> pure.ts
+	Assert.test.ts --> pure.ts
+
+	subgraph Builds
+		browser.ts
+		thread.ts
+		test.ts
+	end
+
+	browser.ts --> dom.ts
+	browser.ts --> Fetch.http.ts
+	thread.ts --> Fetch.http.ts
+	thread.ts --> worker.ts
+	test.ts --> pure.ts
+	test.ts --> Assert.test.ts
+```
+```ts
+const classify = PS.Classify.File.FromExtensions([
+	"pure", "http", "dom", "worker", "test", "browser", "thread",
+])
+const po = PS.Compare.PartialOrder.Make([
+	["browser", ["http", "dom"], "pure"],
+	["thread", ["http", "worker"], "pure"],
+	["test", "pure"],
 ])
 const plugin = PS.Pipe(
 	PS.Compare.ClassifyAndCompare(classify, po),
@@ -128,12 +117,9 @@ graph BT;
 	end
 	worker.ts --> pure.ts
 
-	subgraph NodeJS
-		Assert.test.ts
-	end
 	Assert.test.ts --> pure.ts
 
-	subgraph Build Entries
+	subgraph Builds
 		Main.ts
 		Foo.ts
 		Bar.ts

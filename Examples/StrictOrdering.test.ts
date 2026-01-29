@@ -3,8 +3,8 @@ import { expect } from "expect"
 
 import * as PS from "../nodejs.ts"
 
-await describe("Diamond: cache, http, state, pure", async () => {
-	const classify = PS.Classify.File.FromExtensions(["pure", "domain", "math"])
+await describe("Strict Ordering: math -> domain -> pure", async () => {
+	const classify = PS.Classify.File.FromExtensions(["pure", "math", "domain"])
 	const po = PS.Compare.PartialOrder.Make([
 		["math", "domain", "pure"],
 	])

@@ -38,7 +38,5 @@ const classifyAndCompare = <T extends PartialOrder.Key>(
 export const ClassifyAndCompare = <T extends PartialOrder.Key>(
 	classify: Classify.Classifier<T>,
 	partialOrder: Result<PartialOrder<T>, string>,
-): Result<Checker<void>, string> => Pipe(
-	partialOrder,
-	Result.Map(po => classifyAndCompare(classify, po))
-)
+): Result<Checker<void>, string> =>
+	Result.Map(partialOrder, po => classifyAndCompare(classify, po))
