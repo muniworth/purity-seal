@@ -11,13 +11,13 @@
 graph BT;
 	http.ts --> pure.ts
 	state.ts --> pure.ts
-	browser.ts --> state.ts
-	browser.ts --> http.ts
+	http.state.ts --> state.ts
+	http.state.ts --> http.ts
 ```
 ```ts
-const classify = PS.Classify.File.FromExtensions(["browser", "pure", "state", "http"])
+const classify = PS.Classify.File.FromExtensions(["pure", "state", "http"])
 const po = PS.Compare.PartialOrder.Make([
-	["browser", ["state", "http"], "pure"],
+	["state.http", ["state", "http"], "pure"],
 ])
 const plugin = PS.Pipe(
 	PS.Compare.ClassifyAndCompare(classify, po),

@@ -1,5 +1,4 @@
 import { CurryRev } from "../Function/pure.ts"
-import { Option } from "../Option/pure.ts"
 
 export type Array<A> = globalThis.ReadonlyArray<A>
 export type ArrayMut<A> = globalThis.Array<A>
@@ -35,47 +34,24 @@ export type AndEmpty2<
 // Transforms
 // -----------------------------------------------------------------------------
 
+export const Filter_ = <A>(xs: readonly A[], pred: (a: A, i: number) => boolean): A[] => {
+	const out: A[] = []
+	for (let i=0; i < xs.length; i++) {
+		const x = xs[i]!
+		if (pred(x, i)) out.push(x)
+	}
+	return out
+}
+export const Filter: {
+	<A, B extends A>(xs: readonly A[], refine: (a: A, i: number) => a is B): B[]
+	<A, B extends A>(refine: (a: A, i: number) => a is B): (xs: readonly A[]) => B[]
+	<A>(xs: readonly A[], pred: (a: A, i: number) => boolean): A[]
+	<A>(pred: (a: NoInfer<A>, i: number) => boolean): (xs: readonly A[]) => A[]
+} = CurryRev(Filter_)
+
 export const Map_ = <A extends readonly any[], B>(xs: A, f: (a: Infer<A>, i: number) => B): AndEmpty1<A, B> =>
 	xs.map(f) as AndEmpty1<A, B>
 export const Map: {
   <A extends Array<any>, B>(f: (a: Infer<A>, i: number) => B): (xs: A) => AndEmpty1<A, B>
   <A extends Array<any>, B>(xs: A, f: (a: Infer<A>, i: number) => B): AndEmpty1<A, B>
 } = CurryRev(Map_)
-
-// -----------------------------------------------------------------------------
-// Reductions
-// -----------------------------------------------------------------------------
-
-// -----------------------------------------------------------------------------
-// Searching
-// -----------------------------------------------------------------------------
-
-export const Find_ = <A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A> =>
-	Option.OfNullable(xs.find(pred))
-export const Find: {
-	<A, B extends A>(xs: readonly A[], pred: (x: A, i: number) => x is B): Option<B>
-	<A, B extends A>(pred: (x: A, i: number) => x is B): (xs: readonly A[]) => Option<B>
-	<A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A>
-	<A>(pred: (x: A, i: number) => boolean): (xs: readonly A[]) => Option<A>
-} = CurryRev(Find_)
-
-export const FindLast_ = <A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A> =>
-	Option.OfNullable(xs.findLast(pred))
-export const FindLast: {
-	<A, B extends A>(xs: readonly A[], pred: (x: A, i: number) => x is B): Option<B>
-	<A, B extends A>(pred: (x: A, i: number) => x is B): (xs: readonly A[]) => Option<B>
-	<A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A>
-	<A>(pred: (x: A, i: number) => boolean): (xs: readonly A[]) => Option<A>
-} = CurryRev(FindLast_)
-
-export const Map_FindLast = <A, B>(
-	xs: readonly A[],
-	proj: (a: A, i: number) => B,
-	pred: (b: B, j: number) => boolean,
-): Option<B> => {
-	for (let i = xs.length-1; i >= 0; i--) {
-		const y = proj(xs[i]!, i)
-		if (pred(y, i)) return Option.Some(y)
-	}
-	return Option.None()
-}

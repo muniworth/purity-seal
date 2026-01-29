@@ -56,7 +56,7 @@
 		{ "format": "svg", "extensions": ["pure.ts"], "icon": "haskell", "filename": true },
 		// NodeJS
 		{ "format": "svg", "extensions": [".nodejs.ts"], "icon": "node", "filename": true, "overrides": "typescript" },
-		{ "format": "svg", "extensions": ["nodejs.ts"], "icon": "node", "filename": true, "overrides": "typescript" },
+		{ "format": "svg", "extensions": ["nodejs.ts"], "icon": "node", "filename": true },
 		// Tests
 		{ "format": "svg", "extensions": [".test.ts"], "icon": "test", "overrides": "testts" },
 		{ "format": "svg", "extensions": ["test.ts"], "icon": "test", "filename": true },

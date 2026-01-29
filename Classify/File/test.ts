@@ -4,8 +4,8 @@ import { expect } from "expect"
 import { Option } from "../../Lib/pure.ts"
 import { Classify } from "../nodejs.ts"
 
-await describe("Classify file by one extension", async () => {
-	const classify = Classify.File.FromExtensions(["pure", "dom", "http"])
+await describe("Classify file by extensions", async () => {
+	const classify = Classify.File.FromExtensions(["pure", "dom", "http", "state"])
 
 	await it("Fails if missing", () => {
 		expect(classify("")).toEqual(Option.None())
@@ -22,13 +22,15 @@ await describe("Classify file by one extension", async () => {
 		expect(classify("foo_bar/Bar.pure.ts")).toEqual(Option.Some("pure"))
 	})
 
-	await it("Picks last file extension when one or more match", () => {
+	await it("Ignores unrecognized extensions", () => {
 		expect(classify("pure.d.ts")).toEqual(Option.Some("pure"))
 		expect(classify("http.foo.ts")).toEqual(Option.Some("http"))
-		expect(classify("dom.http.ts")).toEqual(Option.Some("http"))
-		expect(classify("http.dom.ts")).toEqual(Option.Some("dom"))
-		expect(classify("dom.pure.ts")).toEqual(Option.Some("pure"))
-		expect(classify("pure.dom.ts")).toEqual(Option.Some("dom"))
+		expect(classify("foo.http.ts")).toEqual(Option.Some("http"))
+	})
+
+	await it("Matches glob extension to sorted glob", () => {
+		expect(classify("dom.http.ts")).toEqual(Option.Some("dom.http"))
+		expect(classify("http.dom.ts")).toEqual(Option.Some("dom.http"))
 	})
 
 	await it("Ignores filepath", () => {

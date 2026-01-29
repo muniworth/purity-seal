@@ -22,6 +22,13 @@ export const None = <A = never>(): Option<A> => none
 export const OfNullable = <A>(value: A | null | undefined): Option<NonNullable<A>> =>
 	(value === null || value === undefined) ? none : Some(value)
 
+export const Some_Filter_ = <A>(a: A, pred: (a: A) => boolean): Option<A> =>
+	pred(a) ? Some(a) : None()
+export const Some_Filter: {
+	<A>(a: A, pred: (a: A) => boolean): Option<A>
+	<A>(pred: (a: A) => boolean): (a: A) => Option<A>
+} = CurryRev(Some_Filter_)
+
 // -----------------------------------------------------------------------------
 // Predicates
 // -----------------------------------------------------------------------------

@@ -26,7 +26,7 @@ await describe("Checker", async () => {
 		expect(Compare.Opinion.Pure(undefined)).toEqual(checker(["a.foo", "b.foo"]))
 	})
 
-	await it("Filter Extension", () => {
+	await it("Filter extension", () => {
 		const checker = Compare.Checker.IfM(
 			Compare.Checker.Asks(([x, y]) => x.endsWith(".ts") && y.endsWith(".ts")),
 			Compare.Checker.Allow(),
@@ -38,7 +38,7 @@ await describe("Checker", async () => {
 		expect(Compare.Opinion.Deny(["a.zz", "b.zz"])).toEqual(checker(["a.zz", "b.zz"]))
 	})
 
-	await it("Alternative Filter", () => {
+	await it("Alternative filter", () => {
 		const checker = Pipe(
 			Compare.Checker.AsksWhen(
 				([x, y]) => x.endsWith(".ts") && y.endsWith(".ts"),
