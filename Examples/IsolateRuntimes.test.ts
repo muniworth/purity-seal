@@ -7,13 +7,13 @@ await describe("Isolate Runtimes: dom, worker, test", async () => {
 	const classify = PS.Classify.File.FromExtensions([
 		"pure", "http", "dom", "worker", "test", "browser", "thread",
 	])
-	const po = PS.Compare.PartialOrder.Make([
-		["browser", ["http", "dom"], "pure"],
-		["thread", ["http", "worker"], "pure"],
-		["test", "pure"],
-	])
 	const check = PS.Pipe(
-		PS.Compare.ClassifyAndCompare(classify, po),
+		PS.Compare.PartialOrder.Make([
+			["browser", ["http", "dom"], "pure"],
+			["thread", ["http", "worker"], "pure"],
+			["test", "pure"],
+		]),
+		PS.Compare.BuildChecker(classify),
 		PS.Result.GetOrThrow,
 	)
 

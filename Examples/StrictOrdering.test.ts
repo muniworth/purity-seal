@@ -5,11 +5,11 @@ import * as PS from "../nodejs.ts"
 
 await describe("Strict Ordering: math -> domain -> pure", async () => {
 	const classify = PS.Classify.File.FromExtensions(["pure", "math", "domain"])
-	const po = PS.Compare.PartialOrder.Make([
-		["math", "domain", "pure"],
-	])
 	const check = PS.Pipe(
-		PS.Compare.ClassifyAndCompare(classify, po),
+		PS.Compare.PartialOrder.Make([
+			["math", "domain", "pure"],
+		]),
+		PS.Compare.BuildChecker(classify),
 		PS.Result.GetOrThrow,
 	)
 

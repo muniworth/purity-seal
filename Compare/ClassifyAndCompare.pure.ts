@@ -35,8 +35,8 @@ const classifyAndCompare = <T extends PartialOrder.Key>(
  * `classRules`, then the returned checker behaves as `Pure(undefined)` (i.e.,
  * it has "no opinion" on whether the file should be allowed or rejected).
  */
-export const ClassifyAndCompare = <T extends PartialOrder.Key>(
-	classify: Classify.Classifier<T>,
-	partialOrder: Result<PartialOrder<T>, string>,
-): Result<Checker<void>, string> =>
-	Result.Map(partialOrder, po => classifyAndCompare(classify, po))
+export const BuildChecker = <T extends string>
+	(classify: Classify.Classifier<Classify.Classifier.GlobExtension<T>>) =>
+	(partialOrder: Result<PartialOrder<Classify.Classifier.GlobExtension<T>>, string>)
+	: Result<Checker<void>, string> =>
+		Result.Map(partialOrder, po => classifyAndCompare(classify, po))

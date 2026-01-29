@@ -47,12 +47,8 @@ export const Make = <T extends Key>(chains: Chain<T>[]): Result<PartialOrder<T>,
 		let xs = Array.isArray(head) ? head : [head]
 		for (const l of tail) {
 			const ys = Array.isArray(l) ? l : [l]
-			for (const x1 of xs) {
-				// TODO code quality - these filters should match Classify.File behavior.
-				// Should therefore factor out to shared file extension code.
-				const x = typeof x1 === "string" ? x1.split(".").sort().join(".") as T : x1
-				for (const y1 of ys) {
-					const y = typeof y1 === "string" ? y1.split(".").sort().join(".") as T : y1
+			for (const x of xs) {
+				for (const y of ys) {
 					addRelSym(x, "<", y)
 
 					// Transitively-close y: for each w < x, symmetrically set w < y.

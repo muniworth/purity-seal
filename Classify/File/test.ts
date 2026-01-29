@@ -30,7 +30,7 @@ await describe("Classify file by extensions", async () => {
 
 	await it("Matches glob extension to sorted glob", () => {
 		expect(classify("dom.http.ts")).toEqual(Option.Some("dom.http"))
-		expect(classify("http.dom.ts")).toEqual(Option.Some("dom.http"))
+		expect(classify("http.dom.ts")).toEqual(Option.Some("http.dom"))
 	})
 
 	await it("Ignores filepath", () => {
