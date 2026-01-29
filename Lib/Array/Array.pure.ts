@@ -58,3 +58,24 @@ export const Find: {
 	<A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A>
 	<A>(pred: (x: A, i: number) => boolean): (xs: readonly A[]) => Option<A>
 } = CurryRev(Find_)
+
+export const FindLast_ = <A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A> =>
+	Option.OfNullable(xs.findLast(pred))
+export const FindLast: {
+	<A, B extends A>(xs: readonly A[], pred: (x: A, i: number) => x is B): Option<B>
+	<A, B extends A>(pred: (x: A, i: number) => x is B): (xs: readonly A[]) => Option<B>
+	<A>(xs: readonly A[], pred: (x: A, i: number) => boolean): Option<A>
+	<A>(pred: (x: A, i: number) => boolean): (xs: readonly A[]) => Option<A>
+} = CurryRev(FindLast_)
+
+export const Map_FindLast = <A, B>(
+	xs: readonly A[],
+	proj: (a: A, i: number) => B,
+	pred: (b: B, j: number) => boolean,
+): Option<B> => {
+	for (let i = xs.length-1; i >= 0; i--) {
+		const y = proj(xs[i]!, i)
+		if (pred(y, i)) return Option.Some(y)
+	}
+	return Option.None()
+}
