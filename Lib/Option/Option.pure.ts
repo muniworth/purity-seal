@@ -62,9 +62,15 @@ export const All = <const Os extends readonly Option<unknown>[]>(
 	return Some(out as { [K in keyof Os]: Os[K] extends Option<infer A> ? A : never })
 }
 
+export const Bind_ = <A, B>(opt: Option<A>, f: (a: A) => Option<B>): Option<B> =>
+	IsSome(opt) ? f(opt.value) : none
+export const Bind: {
+	<A, B>(opt: Option<A>, f: (a: A) => Option<B>): Option<B>
+	<A, B>(f: (a: A) => Option<B>): (opt: Option<A>) => Option<B>
+} = CurryRev(Bind_)
+
 export const Map_ = <A, B>(opt: Option<A>, f: (a: A) => B): Option<B> =>
 	IsSome(opt) ? Some(f(opt.value)) : none
-/** Applies some function to modify the `Some` case */
 export const Map: {
 	<A, B>(opt: Option<A>, f: (a: A) => B): Option<B>
 	<A, B>(f: (a: A) => B): (opt: Option<A>) => Option<B>
