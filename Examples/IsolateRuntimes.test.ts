@@ -4,7 +4,7 @@ import { expect } from "expect"
 import * as PS from "../nodejs.ts"
 
 await describe("Isolate Runtimes: dom, worker, test", async () => {
-	const classify = PS.Classify.File.FromExtensions([
+	const classify = PS.Classify.Extensions([
 		"pure", "http", "dom", "worker", "test", "browser", "thread",
 	])
 	const po = PS.PartialOrder.Make([

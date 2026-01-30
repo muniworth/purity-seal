@@ -1,2 +1,2 @@
-export * from "./Classifier/pure.ts"
-export * from "./File/nodejs.ts"
+export * from "./Classify.pure.ts"
+export * from "./File.nodejs.ts"

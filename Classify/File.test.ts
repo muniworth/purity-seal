@@ -1,11 +1,22 @@
 import { describe, it } from "node:test"
 import { expect } from "expect"
 
-import { Option } from "../../Lib/pure.ts"
+import { Option } from "../Lib/pure.ts"
 import { Classify } from "../nodejs.ts"
 
 await describe("Classify file by extensions", async () => {
-	const classify = Classify.File.FromExtensions(["pure", "dom", "http", "state"])
+	await it("Fails if glob", () => {
+		const x = (() => {
+			try {
+				Classify.Extensions(["http.state"])
+			} catch (e) {
+				return e instanceof Error ? e.message : "Expected an error"
+			}
+		})()
+		expect(x).toEqual("File extensions may not contain a '.' character. Pass multiple extensions instead.")
+	})
+
+	const classify = Classify.Extensions(["pure", "dom", "http", "state"])
 
 	await it("Fails if missing", () => {
 		expect(classify("")).toEqual(Option.None())

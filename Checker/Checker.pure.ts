@@ -71,13 +71,13 @@ export const IfM: {
  * it has "no opinion" on whether the file should be allowed or rejected).
  */
 export const Build = <T extends string>
-	(classify: Classify.Classifier<Classify.Classifier.GlobExtension<T>>) =>
-	(partialOrder: Result<PartialOrder<Classify.Classifier.GlobExtension<T>>, string>)
+	(classify: Classify<Classify.GlobExtension<T>>) =>
+	(partialOrder: Result<PartialOrder<Classify.GlobExtension<T>>, string>)
 	: Result<Checker<void>, string> =>
 		Result.Map(partialOrder, po => build(classify, po))
 
 const build = <T extends PartialOrder.Key>(
-	classify: Classify.Classifier<T>,
+	classify: Classify<T>,
 	po: PartialOrder<T>,
 ): Checker<void> =>
 	([xPath, yPath]: Deps) => Pipe(

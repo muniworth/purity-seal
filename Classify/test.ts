@@ -1,2 +1,2 @@
-import "./Classifier/test.ts"
-import "./File/test.ts"
+import "./Classify.test.ts"
+import "./File.test.ts"

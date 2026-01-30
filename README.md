@@ -14,7 +14,7 @@ graph BT;
 	http.state.ts --> http.ts
 ```
 ```ts
-const classify = PS.Classify.File.FromExtensions(["pure", "state", "http"])
+const classify = PS.Classify.Extensions(["pure", "state", "http"])
 const po = PS.PartialOrder.Make([
 	[["http.state", "state.http"], ["state", "http"], "pure"],
 ])
@@ -31,7 +31,7 @@ graph LR;
 	math.ts --> domain.ts
 ```
 ```ts
-const classify = PS.Classify.File.FromExtensions(["pure", "math", "domain"])
+const classify = PS.Classify.Extensions(["pure", "math", "domain"])
 const po = PS.PartialOrder.Make([
 	["math", "domain", "pure"],
 ])
@@ -63,7 +63,7 @@ graph BT;
 	test.ts --> Assert.test.ts
 ```
 ```ts
-const classify = PS.Classify.File.FromExtensions([
+const classify = PS.Classify.Extensions([
 	"pure", "http", "dom", "worker", "test", "browser", "thread",
 ])
 const po = PS.PartialOrder.Make([
@@ -86,18 +86,18 @@ graph BT;
 	http.ts --> HTTP_Lib
 ```
 ```ts
-const libHttp = PS.Classify.Classifier.SetWhen(
+const libHttp = PS.Classify.SetWhen(
 	filepath => filepath.endsWith("node_modules/Foo/index.ts"),
 	_filepath => "http",
 )
-const libStats = PS.Classify.Classifier.SetWhen(
+const libStats = PS.Classify.SetWhen(
 	filepath => filepath.endsWith("node_modules/Stats/math.ts"),
 	_filepath => "pure",
 )
 const classify = PS.Pipe(
-	PS.Classify.File.FromExtensions(["pure", "http"]),
-	PS.Classify.Classifier.Catch(libHttp),
-	PS.Classify.Classifier.Catch(libStats),
+	PS.Classify.Extensions(["pure", "http"]),
+	PS.Classify.Catch(libHttp),
+	PS.Classify.Catch(libStats),
 )
 const po = PS.PartialOrder.Make([
 	["http", "pure"],
@@ -117,9 +117,9 @@ const allowWhiteList = PS.Checker.AsksWhen(
 	PS.Checker.Allow(),
 )
 const classify = PS.Pipe(
-	PS.Classify.File.FromExtensions(["pure", "http"]),
-	PS.Classify.Classifier.Catch(libHttp),
-	PS.Classify.Classifier.Catch(libStats),
+	PS.Classify.Extensions(["pure", "http"]),
+	PS.Classify.Catch(libHttp),
+	PS.Classify.Catch(libStats),
 )
 const po = PS.PartialOrder.Make([
 	["http", "pure"],

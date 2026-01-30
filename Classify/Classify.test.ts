@@ -1,45 +1,45 @@
 import { describe, it } from "node:test"
 import { expect } from "expect"
 
-import * as PS from "../../nodejs.ts"
+import * as PS from "../nodejs.ts"
 
 await describe("Classifier Monad", async () => {
-	const run = (path: string) => <A, B>(a: PS.Classify.Classifier<A>, b: PS.Option<B>) =>
+	const run = (path: string) => <A, B>(a: PS.Classify<A>, b: PS.Option<B>) =>
 		expect(a(path)).toEqual(b)
-	const equal = (path: string) => <A, B>(a: PS.Classify.Classifier<A>, b: PS.Classify.Classifier<B>) =>
+	const equal = (path: string) => <A, B>(a: PS.Classify<A>, b: PS.Classify<B>) =>
 		expect(a(path)).toEqual(b(path))
 
 	await it("Composes Reader and Option", () => {
 		run("filepath")(
-			PS.Classify.Classifier.Pure("http"),
+			PS.Classify.Pure("http"),
 			PS.Option.Some("http"),
 		)
 
 		run("filename")(
-			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.Map(x => x)),
+			PS.Pipe(PS.Classify.Pure("pure"), PS.Classify.Map(x => x)),
 			PS.Option.Some("pure"),
 		)
 		run("filename")(
-			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.Map(_ => "http")),
+			PS.Pipe(PS.Classify.Pure("pure"), PS.Classify.Map(_ => "http")),
 			PS.Option.Some("http"),
 		)
 
 		equal("filename")(
-			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.Map(x => x)),
-			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.BindOption(PS.Option.Some)),
+			PS.Pipe(PS.Classify.Pure("pure"), PS.Classify.Map(x => x)),
+			PS.Pipe(PS.Classify.Pure("pure"), PS.Classify.BindOption(PS.Option.Some)),
 		)
 	})
 
 	await it("Reclassify", () => {
 		run("node_modules/Lib/fetch.ts")(
-			PS.Classify.Classifier.AsksWhen(
+			PS.Classify.AsksWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
 				_filepath => PS.Option.Some("http"),
 			),
 			PS.Option.Some("http"),
 		)
 		run("node_modules/Lib/fetch.ts")(
-			PS.Classify.Classifier.SetWhen(
+			PS.Classify.SetWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
 				_filepath => "http",
 			),
@@ -47,14 +47,14 @@ await describe("Classifier Monad", async () => {
 		)
 
 		run("filename")(
-			PS.Classify.Classifier.AsksWhen(
+			PS.Classify.AsksWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
 				_filepath => PS.Option.Some("http"),
 			),
 			PS.Option.None()
 		)
 		run("filename")(
-			PS.Classify.Classifier.SetWhen(
+			PS.Classify.SetWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
 				_filepath => "http",
 			),
