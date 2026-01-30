@@ -1,68 +1,64 @@
 import { describe, it } from "node:test"
 import { expect } from "expect"
 
-import { Option, Pipe } from "../../Lib/pure.ts"
-import { Classify } from "../nodejs.ts"
+import * as PS from "../../nodejs.ts"
 
-await describe("Classify file by extensions", async () => {
-	const run = (path: string) => <A, B>(a: Classify.Classifier<A>, b: Option<B>) =>
+await describe("Classifier Monad", async () => {
+	const run = (path: string) => <A, B>(a: PS.Classify.Classifier<A>, b: PS.Option<B>) =>
 		expect(a(path)).toEqual(b)
-	const equal = (path: string) => <A, B>(a: Classify.Classifier<A>, b: Classify.Classifier<B>) =>
+	const equal = (path: string) => <A, B>(a: PS.Classify.Classifier<A>, b: PS.Classify.Classifier<B>) =>
 		expect(a(path)).toEqual(b(path))
 
 	await it("Composes Reader and Option", () => {
-		// Pure
 		run("filepath")(
-			Classify.Classifier.Pure("http"),
-			Option.Some("http"),
+			PS.Classify.Classifier.Pure("http"),
+			PS.Option.Some("http"),
 		)
 
-		// Map
 		run("filename")(
-			Pipe(Classify.Classifier.Pure("pure"), Classify.Classifier.Map(x => x)),
-			Option.Some("pure"),
+			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.Map(x => x)),
+			PS.Option.Some("pure"),
 		)
 		run("filename")(
-			Pipe(Classify.Classifier.Pure("pure"), Classify.Classifier.Map(_ => "http")),
-			Option.Some("http"),
+			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.Map(_ => "http")),
+			PS.Option.Some("http"),
 		)
 
-		// BindOption
 		equal("filename")(
-			Pipe(Classify.Classifier.Pure("pure"), Classify.Classifier.Map(x => x)),
-			Pipe(Classify.Classifier.Pure("pure"), Classify.Classifier.BindOption(Option.Some)),
+			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.Map(x => x)),
+			PS.Pipe(PS.Classify.Classifier.Pure("pure"), PS.Classify.Classifier.BindOption(PS.Option.Some)),
 		)
 	})
 
 	await it("Reclassify", () => {
 		run("node_modules/Lib/fetch.ts")(
-			Classify.Classifier.AsksWhen(
+			PS.Classify.Classifier.AsksWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
-				_filepath => Option.Some("http"),
+				_filepath => PS.Option.Some("http"),
 			),
-			Option.Some("http"),
+			PS.Option.Some("http"),
 		)
 		run("node_modules/Lib/fetch.ts")(
-			Classify.Classifier.SetWhen(
+			PS.Classify.Classifier.SetWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
 				_filepath => "http",
 			),
-			Option.Some("http"),
+			PS.Option.Some("http"),
 		)
 
 		run("filename")(
-			Classify.Classifier.AsksWhen(
+			PS.Classify.Classifier.AsksWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
-				_filepath => Option.Some("http"),
+				_filepath => PS.Option.Some("http"),
 			),
-			Option.None()
+			PS.Option.None()
 		)
 		run("filename")(
-			Classify.Classifier.SetWhen(
+			PS.Classify.Classifier.SetWhen(
 				filepath => filepath.endsWith("Lib/fetch.ts"),
 				_filepath => "http",
 			),
-			Option.None()
+			PS.Option.None()
 		)
 	})
 })

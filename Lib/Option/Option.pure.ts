@@ -76,6 +76,13 @@ export const Map: {
 	<A, B>(f: (a: A) => B): (opt: Option<A>) => Option<B>
 } = CurryRev(Map_)
 
+export const Catch_ = <A, B>(opt: Option<A>, f: () => Option<B>): Option<A|B> =>
+	IsSome(opt) ? opt : f()
+export const Catch: {
+	<A, B>(opt: Option<A>, f: () => Option<B>): Option<A|B>
+	<A, B>(f: () => Option<B>): (opt: Option<A>) => Option<A|B>
+} = CurryRev(Catch_)
+
 // -----------------------------------------------------------------------------
 // Eliminators
 // -----------------------------------------------------------------------------

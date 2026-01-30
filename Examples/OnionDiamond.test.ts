@@ -3,7 +3,7 @@ import { expect } from "expect"
 
 import * as PS from "../nodejs.ts"
 
-await describe("Diamond: cache, http, state, pure", async () => {
+await describe("Onion architecture diamond: cache, http, state, pure", async () => {
 	const classify = PS.Classify.File.FromExtensions(["pure", "state", "http"])
 	const po = PS.PartialOrder.Make([
 		[["http.state", "state.http"], ["state", "http"], "pure"],

@@ -2,9 +2,8 @@
 - [Enforce Onion Architecture](#enforce-onion-architecture)
 - [Separate Business Logic from Library](#separate-business-logic-from-library)
 - [Isolate Runtime Platforms](#isolate-runtime-platforms)
-- [The Kitchen Sink](#the-kitchen-sink)
+- [Multiple Classifiers](#multiple-classifiers)
 - [Alternative](#alternative)
-- [Reclassify](#reclassify)
 
 ### Enforce Onion Architecture
 ```mermaid
@@ -78,110 +77,56 @@ const check = PS.Pipe(
 )
 ```
 
-### The Kitchen Sink
+### Multiple Classifiers
+Third party code may follow different conventions.
 ```mermaid
 graph BT;
-	subgraph Browser Main Thread
-		dom.ts
-		Find.dom.ts
-		Event.dom.ts
-	end
-	dom.ts --> Find.dom.ts
-	dom.ts --> Event.dom.ts
-	Event.dom.ts --> pure.ts
-
-	subgraph UI Components
-		Button.ui.ts
-		Feature.ui.ts
-	end
-	Button.ui.ts --> dom.ts
-	Feature.ui.ts --> Button.ui.ts
-	Feature.ui.ts --> provider.ts
-
-	subgraph Fetch API
-		http.ts
-	end
+	pure.ts --> Stats_Lib
 	http.ts --> pure.ts
-
-	Cache.state.ts --> pure.ts
-
-	subgraph HTTP Cache
-		provider.ts
-	end
-	provider.ts --> Cache.state.ts
-	provider.ts --> http.ts
-
-	subgraph Worker Thread Context
-		worker.ts
-	end
-	worker.ts --> pure.ts
-
-	Assert.test.ts --> pure.ts
-
-	subgraph Builds
-		Main.ts
-		Foo.ts
-		Bar.ts
-		test.ts
-	end
-
-	Main.ts --> dom.ts
-	Main.ts --> provider.ts
-	Main.ts --> Feature.ui.ts
-	Foo.ts --> provider.ts
-	Foo.ts --> worker.ts
-	Bar.ts --> worker.ts
-	test.ts --> pure.ts
-	test.ts --> Assert.test.ts
+	http.ts --> HTTP_Lib
 ```
 ```ts
-const graph = PuritySeal.Classify({
-	Unit: ["pure"],
-	Exclusive: ["dom", "test", "worker"],
-	Commutative: ["http", "state"],
-	Composite: [
-		["provider", ["http", "state"]],
-		["ui", ["provider", "dom"]],
-	],
-	Directional: [
-		{ Dependent: "domain", Dependency: "pure" },
-		{ Dependent: "math", Dependency: "pure" },
-		{ Dependent: "math", Dependency: "domain" },
-	],
-})
+const libHttp = PS.Classify.Classifier.SetWhen(
+	filepath => filepath.endsWith("node_modules/Foo/index.ts"),
+	_filepath => "http",
+)
+const libStats = PS.Classify.Classifier.SetWhen(
+	filepath => filepath.endsWith("node_modules/Stats/math.ts"),
+	_filepath => "pure",
+)
+const classify = PS.Pipe(
+	PS.Classify.File.FromExtensions(["pure", "http"]),
+	PS.Classify.Classifier.Catch(libHttp),
+	PS.Classify.Classifier.Catch(libStats),
+)
+const po = PS.PartialOrder.Make([
+	["http", "pure"],
+])
+const check = PS.Pipe(
+	PS.Compare.BuildChecker(classify)(po),
+	PS.Plugin.Esbuild,
+)
 ```
 
 ### Alternative
-For a given dependency and dependent, re-try using a different graph.
+For a given dependency and dependent, explicitly allow or deny.
 ```ts
-const allowExternal = PuritySeal.AsksWhen(
-	x => x.Dependency.startsWith("node_modules"),
-	PuritySeal.Allow(),
+const whitelist = new Set(["Source/index.ts"])
+const allowWhiteList = PS.Compare.Checker.AsksWhen(
+	([x, y]) => whiteList.includes(x) || whiteList.includes(y),
+	PS.Compare.Checker.Allow(),
 )
-const allowKludge = PuritySeal.AsksWhen(
-	x => x.Dependent === "filepath1" && (
-		x.Dependency.includes("subpath1")
-		|| x.Dependency.includes("subpath2")
-	),
-	PuritySeal.Allow(),
+const classify = PS.Pipe(
+	PS.Classify.File.FromExtensions(["pure", "http"]),
+	PS.Classify.Classifier.Catch(libHttp),
+	PS.Classify.Classifier.Catch(libStats),
 )
-const graph = Pipe(
-	PuritySeal.Classify({ Unit: ["pure"] }),
-	PuritySeal.Alternative(allowExternal),
-	PuritySeal.Alternative(allowKludge),
+const po = PS.PartialOrder.Make([
+	["http", "pure"],
+])
+const check = PS.Pipe(
+	PS.Compare.BuildChecker(classify)(po),
+	PS.Checker.Then(allowWhiteList)
+	PS.Plugin.Esbuild,
 )
-```
-
-### Reclassify
-Logically re-map a dependency to a new set of file extensions before validating against the graph.
-```ts
-const barHTTP = PuritySeal.Reclassify(
-	dependency => dependency.startsWith("node_modules/bar"),
-	["http"],
-)
-const graph = PuritySeal.Classify({
-	Unit: ["pure"],
-	Commutative: ["http", "state"],
-	Reclassify: [barHTTP],
-})
 ```
