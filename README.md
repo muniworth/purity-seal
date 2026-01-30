@@ -84,23 +84,31 @@ graph BT;
 	pure.ts --> Stats_Lib
 	http.ts --> pure.ts
 	http.ts --> HTTP_Lib
+	http.ts --> Framework.cache
+	dom.http --> http.ts
+	dom.http ---> Framework
 ```
 ```ts
-const libHttp = PS.Classify.SetWhen(
-	filepath => filepath.endsWith("node_modules/Foo/index.ts"),
-	_filepath => "http",
-)
 const libStats = PS.Classify.SetWhen(
-	filepath => filepath.endsWith("node_modules/Stats/math.ts"),
+	filepath => filepath.startsWith("node_modules/Stats"),
 	_filepath => "pure",
 )
+const libHttp = PS.Classify.SetWhen(
+	filepath => filepath === "node_modules/FancyHTTP/index.ts",
+	_filepath => "http",
+)
+const libGlob = PS.Classify.SetWhen(
+	filepath => filepath.startsWith("node_modules/framework"),
+	filepath => filepath.includes("cache") ? "http" : "dom.http",
+)
 const classify = PS.Pipe(
-	PS.Classify.Extensions(["pure", "http"]),
-	PS.Classify.Catch(libHttp),
+	PS.Classify.Extensions(["pure", "http", "dom"]),
 	PS.Classify.Catch(libStats),
+	PS.Classify.Catch(libHttp),
+	PS.Classify.Catch(libGlob),
 )
 const po = PS.PartialOrder.Make([
-	["http", "pure"],
+	["dom.http", ["dom", "http"], "pure"],
 ])
 const check = PS.Pipe(
 	PS.Checker.BuildChecker(classify)(po),
