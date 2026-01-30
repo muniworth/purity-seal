@@ -44,8 +44,7 @@ export const Esbuild = (check: Compare.Checker<void>) => ({
 							warn(dependent, dependency, result.Message)
 							break
 						case "Deny":
-							// esbuild always outputs dependent in error message.
-							const reason = `ClassifyAndCompare: can not depend on ${result.Deps[1]}`
+							const reason = `Deny: ${result.Deps[0]} depends on ${result.Deps[1]}`
 							error(dependent, dependency, reason)
 							break
 						default: result satisfies never
