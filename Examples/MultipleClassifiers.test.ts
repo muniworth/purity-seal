@@ -21,15 +21,15 @@ await describe("Multiple Classifiers", async () => {
 		["http", "pure"],
 	])
 	const check = PS.Pipe(
-		PS.Compare.BuildChecker(classify)(po),
+		PS.Checker.Build(classify)(po),
 		PS.Result.GetOrThrow,
 	)
 
 	await it("Classifies external code", () => {
-		expect(check(["http.ts", "node_modules/FancyHTTP/index.ts"])).toEqual(PS.Compare.Opinion.Allow())
-		expect(check(["pure.ts", "node_modules/FancyHTTP/index.ts"])).toEqual(PS.Compare.Opinion.Deny(["pure.ts", "node_modules/FancyHTTP/index.ts"]))
+		expect(check(["http.ts", "node_modules/FancyHTTP/index.ts"])).toEqual(PS.Checker.Opinion.Allow())
+		expect(check(["pure.ts", "node_modules/FancyHTTP/index.ts"])).toEqual(PS.Checker.Opinion.Deny(["pure.ts", "node_modules/FancyHTTP/index.ts"]))
 
-		expect(check(["http.ts", "node_modules/Stats/math.ts"])).toEqual(PS.Compare.Opinion.Allow())
-		expect(check(["pure.ts", "node_modules/Stats/math.ts"])).toEqual(PS.Compare.Opinion.Allow())
+		expect(check(["http.ts", "node_modules/Stats/math.ts"])).toEqual(PS.Checker.Opinion.Allow())
+		expect(check(["pure.ts", "node_modules/Stats/math.ts"])).toEqual(PS.Checker.Opinion.Allow())
 	})
 })

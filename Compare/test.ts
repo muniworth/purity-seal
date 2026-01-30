@@ -1,1 +1,0 @@
-import "./Checker/test.ts"

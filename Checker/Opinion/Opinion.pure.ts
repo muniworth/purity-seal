@@ -1,5 +1,5 @@
 // Circular, but it's type-only so it's fine.
-import type { Deps } from "../Checker/Checker.pure.ts"
+import type { Deps } from "../Checker.pure.ts"
 
 /** Pure is the monad success case for checker pipelines
   * to continue running, i.e. Pure = Undecided.

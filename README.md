@@ -19,7 +19,7 @@ const po = PS.PartialOrder.Make([
 	[["http.state", "state.http"], ["state", "http"], "pure"],
 ])
 const check = PS.Pipe(
-	PS.Compare.BuildChecker(classify)(po),
+	PS.Checker.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -36,7 +36,7 @@ const po = PS.PartialOrder.Make([
 	["math", "domain", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Compare.BuildChecker(classify)(po),
+	PS.Checker.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -72,7 +72,7 @@ const po = PS.PartialOrder.Make([
 	["test", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Compare.BuildChecker(classify)(po),
+	PS.Checker.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -103,7 +103,7 @@ const po = PS.PartialOrder.Make([
 	["http", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Compare.BuildChecker(classify)(po),
+	PS.Checker.BuildChecker(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -112,9 +112,9 @@ const check = PS.Pipe(
 For a given dependency and dependent, explicitly allow or deny.
 ```ts
 const whitelist = new Set(["Source/index.ts"])
-const allowWhiteList = PS.Compare.Checker.AsksWhen(
+const allowWhiteList = PS.Checker.AsksWhen(
 	([x, y]) => whiteList.includes(x) || whiteList.includes(y),
-	PS.Compare.Checker.Allow(),
+	PS.Checker.Allow(),
 )
 const classify = PS.Pipe(
 	PS.Classify.File.FromExtensions(["pure", "http"]),
@@ -125,7 +125,7 @@ const po = PS.PartialOrder.Make([
 	["http", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Compare.BuildChecker(classify)(po),
+	PS.Checker.BuildChecker(classify)(po),
 	PS.Checker.Then(allowWhiteList)
 	PS.Plugin.Esbuild,
 )

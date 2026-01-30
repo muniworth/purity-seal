@@ -1,7 +1,7 @@
 import type { PartialMessage, PluginBuild } from "esbuild"
-import type { Compare } from "../nodejs.ts"
+import type { Checker } from "../nodejs.ts"
 
-export const Esbuild = (check: Compare.Checker<void>) => ({
+export const Esbuild = (check: Checker<void>) => ({
 	name: "purity-seal",
 
 	setup: (build: PluginBuild) => {
