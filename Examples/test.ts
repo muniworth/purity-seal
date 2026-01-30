@@ -1,3 +1,4 @@
+import "./AlternativeCheckers.test.ts"
 import "./IsolateRuntimes.test.ts"
 import "./MultipleClassifiers.test.ts"
 import "./OnionDiamond.test.ts"

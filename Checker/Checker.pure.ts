@@ -73,8 +73,8 @@ export const IfM: {
 export const Build = <T extends string>
 	(classify: Classify<Classify.GlobExtension<T>>) =>
 	(partialOrder: Result<PartialOrder<Classify.GlobExtension<T>>, string>)
-	: Result<Checker<void>, string> =>
-		Result.Map(partialOrder, po => build(classify, po))
+	: Checker<void> =>
+		build(classify, Result.GetOrThrow(partialOrder))
 
 const build = <T extends PartialOrder.Key>(
 	classify: Classify<T>,

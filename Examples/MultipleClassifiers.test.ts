@@ -25,10 +25,7 @@ await describe("Multiple Classifiers", async () => {
 	const po = PS.PartialOrder.Make([
 		["dom.http", ["dom", "http"], "pure"],
 	])
-	const check = PS.Pipe(
-		PS.Checker.Build(classify)(po),
-		PS.Result.GetOrThrow,
-	)
+	const check = PS.Checker.Build(classify)(po)
 
 	await it("Classifies external code", () => {
 		expect(check(["http.ts", "node_modules/FancyHTTP/index.ts"])).toEqual(PS.Checker.Opinion.Allow())

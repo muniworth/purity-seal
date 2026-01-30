@@ -1,9 +1,16 @@
-# Purity Seal Examples
+Purity Seal enforces dependency rules. You compose a rules checker, then run it on a dependency graph of type `(dependent, dependency)` string pairs. Ideally you get the dependency graph from your build system, and fail the build if rule validation errors.
+
+1. Classify files, usually by file extension. Classifiers are composable.
+2. Define a partial order that expresses the dependency rules between file extensions. Partial orders may not contain cycles.
+3. Create a checker from the classifier and partial order. Checkers are composable.
+4. Run the checker against a dependency graph, typically via a build system plugin.
+
+# Examples
 - [Enforce Onion Architecture](#enforce-onion-architecture)
 - [Separate Business Logic from Library](#separate-business-logic-from-library)
 - [Isolate Runtime Platforms](#isolate-runtime-platforms)
 - [Multiple Classifiers](#multiple-classifiers)
-- [Alternative](#alternative)
+- [Alternative Checkers](#alternative-checkers)
 
 ### Enforce Onion Architecture
 ```mermaid
@@ -116,25 +123,23 @@ const check = PS.Pipe(
 )
 ```
 
-### Alternative
-For a given dependency and dependent, explicitly allow or deny.
+### Alternative Checkers
+A checker does not have to form an opinion for a given node in the dependency graph. Instead, you can chain multiple checkers in a pipeline, which terminates when a checker forms an opinion.
 ```ts
-const whitelist = new Set(["Source/index.ts"])
-const allowWhiteList = PS.Checker.AsksWhen(
-	([x, y]) => whiteList.includes(x) || whiteList.includes(y),
+const whitelist = new Set(["Source/Legacy/Foo.ts"])
+const allowWhitelist = PS.Checker.AsksWhen(
+	([x, y]) => whitelist.has(x) || whitelist.has(y),
 	PS.Checker.Allow(),
 )
 const classify = PS.Pipe(
 	PS.Classify.Extensions(["pure", "http"]),
-	PS.Classify.Catch(libHttp),
-	PS.Classify.Catch(libStats),
 )
 const po = PS.PartialOrder.Make([
 	["http", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Checker.BuildChecker(classify)(po),
-	PS.Checker.Then(allowWhiteList)
+	PS.Checker.Build(classify)(po),
+	PS.Checker.Then(allowWhitelist),
 	PS.Plugin.Esbuild,
 )
 ```

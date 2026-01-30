@@ -8,10 +8,7 @@ await describe("Onion architecture diamond: cache, http, state, pure", async () 
 	const po = PS.PartialOrder.Make([
 		[["http.state", "state.http"], ["state", "http"], "pure"],
 	])
-	const check = PS.Pipe(
-		PS.Checker.Build(classify)(po),
-		PS.Result.GetOrThrow,
-	)
+	const check = PS.Checker.Build(classify)(po)
 
 	await it("Allow diamond", () => {
 		expect(check(["http.ts", "Root.pure.ts"])).toEqual(PS.Checker.Opinion.Allow())

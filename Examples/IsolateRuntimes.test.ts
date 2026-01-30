@@ -12,10 +12,7 @@ await describe("Isolate Runtimes: dom, worker, test", async () => {
 		["thread", ["http", "worker"], "pure"],
 		["test", "pure"],
 	])
-	const check = PS.Pipe(
-		PS.Checker.Build(classify)(po),
-		PS.Result.GetOrThrow,
-	)
+	const check = PS.Checker.Build(classify)(po)
 
 	await it("Allow same runtime", () => {
 		expect(check(["Fetch.http.ts", "pure.ts"])).toEqual(PS.Checker.Opinion.Allow())

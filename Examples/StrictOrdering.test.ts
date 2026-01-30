@@ -8,10 +8,7 @@ await describe("Strict Ordering: math -> domain -> pure", async () => {
 	const po = PS.PartialOrder.Make([
 		["math", "domain", "pure"],
 	])
-	const check = PS.Pipe(
-		PS.Checker.Build(classify)(po),
-		PS.Result.GetOrThrow,
-	)
+	const check = PS.Checker.Build(classify)(po)
 
 	await it("Allow valid ordering", () => {
 		expect(check(["Foo.pure.ts", "Bar.pure.ts"])).toEqual(PS.Checker.Opinion.Allow())
