@@ -7,6 +7,8 @@
 		"typescript": "^5.9.3"
 	},
 	"scripts": {
+		"build": "node --experimental-strip-types Build.ts --once",
+		"build-prod": "node --experimental-strip-types Build.ts --once --prod",
 		"test": "node --enable-source-maps --test test.ts",
 		"typecheck": "tsc --watch --project tsconfig.json --preserveWatchOutput",
 		"typecheck-once": "tsc --project tsconfig.json"

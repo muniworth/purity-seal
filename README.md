@@ -1,11 +1,12 @@
-Purity Seal enforces dependency rules. You compose a rules checker, then run it on a dependency graph of type `(dependent, dependency)` string pairs. Ideally you get the dependency graph from your build system, and fail the build if rule validation errors.
+Purity Seal enforces dependency rules between files:
 
-1. Classify files, usually by file extension. Classifiers are composable.
-2. Define a partial order that expresses the dependency rules between file extensions. Partial orders may not contain cycles.
-3. Create a checker from the classifier and partial order. Checkers are composable.
-4. Run the checker against a dependency graph, typically via a build system plugin.
+1. Classify files `filepath -> classification`, usually by file extension. *Classifiers are composable.*
+2. Define a `partial order` that expresses dependency rules between file classifications. Partial orders may not contain cycles.
+3. Create a checker from the classifier and partial order. Checkers input a `(dependent, dependency)` string pair, and output an `opinion`. *Checkers are composable.*
+4. Run the checker against a dependency graph, typically using a build system plugin.
 
 # Examples
+- Dog food! Purity Seal [validates itself](https://github.com/muniworth/purity-seal/blob/main/Build.ts).
 - [Enforce Onion Architecture](#enforce-onion-architecture)
 - [Separate Business Logic from Library](#separate-business-logic-from-library)
 - [Isolate Runtime Platforms](#isolate-runtime-platforms)
@@ -26,7 +27,7 @@ const po = PS.PartialOrder.Make([
 	[["http.state", "state.http"], ["state", "http"], "pure"],
 ])
 const check = PS.Pipe(
-	PS.Checker.BuildChecker(classify)(po),
+	PS.Checker.Build(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -43,7 +44,7 @@ const po = PS.PartialOrder.Make([
 	["math", "domain", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Checker.BuildChecker(classify)(po),
+	PS.Checker.Build(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -79,7 +80,7 @@ const po = PS.PartialOrder.Make([
 	["test", "pure"],
 ])
 const check = PS.Pipe(
-	PS.Checker.BuildChecker(classify)(po),
+	PS.Checker.Build(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
@@ -118,7 +119,7 @@ const po = PS.PartialOrder.Make([
 	["dom.http", ["dom", "http"], "pure"],
 ])
 const check = PS.Pipe(
-	PS.Checker.BuildChecker(classify)(po),
+	PS.Checker.Build(classify)(po),
 	PS.Plugin.Esbuild,
 )
 ```
