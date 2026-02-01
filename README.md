@@ -5,7 +5,12 @@ Purity Seal enforces dependency rules between files:
 3. Create a checker from the classifier and partial order. Checkers input a `(dependent, dependency)` string pair, and output an `opinion`. *Checkers are composable.*
 4. Run the checker against a dependency graph, typically using a build system plugin.
 
-# Examples
+### Installation
+```
+npm install purity-seal
+```
+
+## Examples
 - Dog food! Purity Seal [validates itself](https://github.com/muniworth/purity-seal/blob/main/Build.ts).
 - [Enforce Onion Architecture](#enforce-onion-architecture)
 - [Separate Business Logic from Library](#separate-business-logic-from-library)
