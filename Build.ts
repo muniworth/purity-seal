@@ -8,7 +8,7 @@ const watch = !Process.argv.includes("--once")
 const classify = PS.Pipe(
 	PS.Classify.Extensions(["pure", "nodejs", "test"]),
 	PS.Classify.Catch(PS.Classify.SetWhen(
-		fp => fp.startsWith("node:") || fp.startsWith("Plugin"),
+		fp => fp.startsWith("node:"),
 		_ => "nodejs",
 	)),
 )

@@ -96,3 +96,24 @@ const build = <T extends PartialOrder.Key>(
 			},
 		),
 	)
+
+type CheckerResult = { deny: Deps[], warn: string[] }
+export const Validate = (check: Checker<void>, deps: Deps[]): CheckerResult => {
+	const out: CheckerResult = { deny: [], warn: [] }
+	deps.forEach(x => {
+		const opinion = check(x)
+		switch (opinion._tag) {
+		case "Pure":
+			return out.warn.push(`unhandled dependency: [${x[0]} -> ${x[1]}]`)
+		case "Allow":
+			return
+		case "Deny":
+			return out.deny.push(x)
+		case "Warn":
+			return out.warn.push(opinion.Message)
+		default:
+			opinion satisfies never
+		}
+	})
+	return out
+}

@@ -12,6 +12,7 @@ Purity Seal enforces dependency rules between files:
 - [Isolate Runtime Platforms](#isolate-runtime-platforms)
 - [Multiple Classifiers](#multiple-classifiers)
 - [Alternative Checkers](#alternative-checkers)
+- [Lua](#lua)
 
 ### Enforce Onion Architecture
 ```mermaid
@@ -89,9 +90,9 @@ const check = PS.Pipe(
 Third party code may follow different conventions.
 ```mermaid
 graph BT;
-	pure.ts --> Stats_Lib
+	pure.ts --> Stats
 	http.ts --> pure.ts
-	http.ts --> HTTP_Lib
+	http.ts --> HTTP
 	http.ts --> Framework.cache
 	dom.http --> http.ts
 	dom.http ---> Framework
@@ -102,7 +103,7 @@ const libStats = PS.Classify.SetWhen(
 	_filepath => "pure",
 )
 const libHttp = PS.Classify.SetWhen(
-	filepath => filepath === "node_modules/FancyHTTP/index.ts",
+	filepath => filepath === "node_modules/HTTP/index.ts",
 	_filepath => "http",
 )
 const libGlob = PS.Classify.SetWhen(
@@ -143,4 +144,30 @@ const check = PS.Pipe(
 	PS.Checker.Then(allowWhitelist),
 	PS.Plugin.Esbuild,
 )
+```
+
+### Lua
+```mermaid
+graph BT;
+	Player.game.lua --> pure.lua
+	test.lua --> pure.lua
+```
+The lua tooling ecosystem is less advanced than TypeScript, so Purity Seal bundles [luaparse](https://github.com/fstirlitz/luaparse) to help extract a dependency graph.
+```ts
+const classify = PS.Classify.Extensions([
+	"pure", "game", "test",
+])
+const po = PS.PartialOrder.Make([
+	["game", "pure"],// Game engine
+	["test", "pure"],// CLI
+])
+const check = PS.Checker.Build(classify)(po)
+const deps = await PS.Plugin.Lua.BuildDeps(
+	// Arg 1: list of entry point modules
+	// resolveModule: maps modules (including entries) to raw filepath.
+	["Main.game.lua", "test.lua"],
+	{ luaVersion: "5.1", resolveModule: x => "source/" +  x },
+)
+// { deny: Deps[], warn: string[] }
+const out = PS.Checker.Validate(check, deps)
 ```

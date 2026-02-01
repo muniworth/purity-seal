@@ -7,6 +7,7 @@ export const Esbuild = (check: Checker<void>) => ({
 	setup: (build: PluginBuild) => {
 		build.initialOptions.metafile = true
 
+		// TODO use PS.Checker.Validate
 		build.onEnd(buildResult => {
 			if (buildResult.metafile === undefined) return {}
 			const inputs = buildResult.metafile.inputs
@@ -36,7 +37,7 @@ export const Esbuild = (check: Checker<void>) => ({
 					const result = check([dependent, dependency])
 					switch (result._tag) {
 						case "Pure":
-							warn(dependent, dependency, `unhandled dependency`)
+							warn(dependent, dependency, "unhandled dependency")
 							break
 						case "Allow":
 							break

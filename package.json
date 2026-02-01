@@ -1,4 +1,7 @@
 {
+	"dependencies": {
+		"luaparse": "^0.3.1"
+	},
 	"devDependencies": {
 		"@types/express": "^5.0.6",
 		"@types/node": "^25.0.10",
