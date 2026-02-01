@@ -138,12 +138,8 @@ const allowWhitelist = PS.Checker.AsksWhen(
 	([x, y]) => whitelist.has(x) || whitelist.has(y),
 	PS.Checker.Allow(),
 )
-const classify = PS.Pipe(
-	PS.Classify.Extensions(["pure", "http"]),
-)
-const po = PS.PartialOrder.Make([
-	["http", "pure"],
-])
+const classify = PS.Classify.Extensions(["pure", "http"])
+const po = PS.PartialOrder.Make([["http", "pure"]])
 const check = PS.Pipe(
 	PS.Checker.Build(classify)(po),
 	PS.Checker.Then(allowWhitelist),
@@ -173,6 +169,6 @@ const deps = await PS.Plugin.Lua.BuildDeps(
 	["Main.game.lua", "test.lua"],
 	{ luaVersion: "5.1", resolveModule: x => "source/" +  x },
 )
-// { deny: Deps[], warn: string[] }
-const out = PS.Checker.Validate(check, deps)
+const out: { deny: Deps[], warn: string[] } =
+	PS.Checker.Validate(check, deps)
 ```
