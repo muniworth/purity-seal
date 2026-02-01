@@ -4,16 +4,17 @@
 		"allowJs": false,
 		"allowImportingTsExtensions": true,
 		"baseUrl": "./",
-		// Needed for Effect Schema
-		// https://github.com/effect-ts/effect/tree/main/packages/schema#requirements
+		"declaration": true,
+		"emitDeclarationOnly": true,
 		"exactOptionalPropertyTypes": true,
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
 		"lib": ["ES2024", "ESNext"],
 		"module": "nodenext",
 		"moduleResolution": "nodenext",
-		"noEmit": true,
+		"noEmit": false,
 		"noErrorTruncation": true,
+		"outDir": "dist",
 		"target": "esnext",
 		"skipLibCheck": true,
 		// ************ Language features for code verification. ************
@@ -24,5 +25,5 @@
 		"useUnknownInCatchVariables": true,
 	},
 	"include": ["**/*"],
-	"exclude": ["node_modules/**/*"]
+	"exclude": ["dist/**/*", "node_modules/**/*"]
 }

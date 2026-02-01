@@ -8,7 +8,7 @@ const watch = !Process.argv.includes("--once")
 const classify = PS.Pipe(
 	PS.Classify.Extensions(["pure", "nodejs", "test"]),
 	PS.Classify.Catch(PS.Classify.SetWhen(
-		fp => fp.startsWith("node:"),
+		fp => fp.startsWith("node:") || fp === "node_modules/luaparse/luaparse.js",
 		_ => "nodejs",
 	)),
 )
@@ -26,7 +26,7 @@ const esbuild_config = await esbuild.context({
 	entryPoints: ["nodejs.ts"],
 	format: "esm",
 	minify: false,
-	outdir: "build_output_global_var",
+	outdir: "dist",
 	plugins: [check],
 	platform: "node",
 	sourcemap: prod ? false : "inline",
@@ -36,7 +36,7 @@ const esbuild_config = await esbuild.context({
 	splitting: false,
 	target: "esnext",
 	tsconfig: "tsconfig.json",
-	write: false,
+	write: prod,
 })
 
 const contexts = [esbuild_config]
