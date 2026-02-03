@@ -35,16 +35,21 @@ export type AndEmpty2<
 // Type Guards
 // -----------------------------------------------------------------------------
 
-export const IsNonEmpty: {
-	<A>(xs: Array<A>): xs is NonEmpty<A>
-	<A>(xs: A[]): xs is NonEmptyMut<A>
-} = (<A>(xs: A[]) => xs.length > 0) as typeof IsNonEmpty
+// I tried using two versions of this function instead of an overload.
+// That fixes type inference for point-free calls, but it doesn't
+// work if the point-free call is inside a Filter or FilterMap,
+// as those have their own overloads.
+export function IsNonEmpty<A>(xs: A[]): xs is NonEmptyMut<A>
+export function IsNonEmpty<A>(xs: Array<A>): xs is NonEmpty<A>
+export function IsNonEmpty<A>(xs: Array<A>): xs is NonEmpty<A> {
+	return xs.length > 0
+}
 
 // -----------------------------------------------------------------------------
 // Transforms
 // -----------------------------------------------------------------------------
 
-export const Bind_ = <A extends Array<any>, B>(f: (a: Infer<A>, i: number) => B[]) => (xs: A): B[] =>
+export const Bind_ = <A extends Array<any>, B>(xs: A, f: (a: Infer<A>, i: number) => B[]): B[] =>
 	xs.flatMap(f)
 export const Bind: {
 	<A extends Array<any>, B>(xs: A, f: (a: Infer<A>, i: number) => NonEmptyMut<B>): AndEmpty1<A, B>
